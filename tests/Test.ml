@@ -96,7 +96,9 @@ let cases =
     "stroke-2";
     "md:border-t";
     "hover:bg-red-100";
-    "mt-0 pb-2";
+    "border-red-500";
+    "hover:border-red-500";
+    "mt-0 pb-2 border hover:border-red-500";
   ]
 
 let () =
