@@ -14,16 +14,14 @@ module type Css = sig
   val border_width : length -> property
 end
 
-module Css : Css = struct
-  include (val failwith "TODO" : Css)
-end
-
 module Tw = struct
   let len_8px = [ `px0; `px1; `px2; `px4; `px8 ]
   let border_style = [ `solid; `dashed; `dotted; `double; `none ]
 end
 
 let ( let$ ) xs f = List.concat_map f xs
+
+module Char_set = Set.Make (Char)
 
 module Pat_tree = struct
   module Var = struct
@@ -32,9 +30,25 @@ module Pat_tree = struct
       of_string : string -> 'a option;
       value : 'a -> string list;
       values : string list;
+      parser : 'a Angstrom.t;
     }
 
     let side =
+      let parser =
+        let open Angstrom in
+        let* x = peek_char_fail in
+        let out x = advance 1 *> return x in
+        match x with
+        | 'x' -> out `x
+        | 'y' -> out `y
+        | 's' -> out `s
+        | 'e' -> out `e
+        | 't' -> out `t
+        | 'r' -> out `r
+        | 'b' -> out `b
+        | 'l' -> out `l
+        | _ -> fail "side: invalid char"
+      in
       let of_string str =
         match str with
         | "x" -> Some `x
@@ -72,7 +86,7 @@ module Pat_tree = struct
           "left";
         ]
       in
-      { name = "side"; of_string; value; values }
+      { name = "side"; parser; of_string; value; values }
 
     let len =
       let of_string str =
@@ -153,7 +167,8 @@ module Pat_tree = struct
         | `len_96 -> [ "24rem" ]
       in
       let values = [] in
-      { name = "side"; of_string; value; values }
+      let parser = Angstrom.return `len_0 in
+      { name = "side"; parser; of_string; value; values }
 
     let color =
       let of_string str =
@@ -162,13 +177,18 @@ module Pat_tree = struct
         | "black" -> Some `black
         | _ -> None
       in
+      let parser =
+        let open Angstrom in
+        let* color = string "white" <|> string "black" in
+        return (Option.get (of_string color))
+      in
       let value side =
         match side with
         | `white -> [ "rgb(255 255 255)" ]
         | `black -> [ "rgb(0 0 0)" ]
       in
       let values = [] in
-      { name = "side"; of_string; value; values }
+      { name = "side"; parser; of_string; value; values }
   end
 
   module Gen = struct
@@ -201,6 +221,38 @@ module Pat_tree = struct
     let pat = Const ("border", End) in
     let gen () = [ str [ "border-width: 1px;" ] ] in
     Gen (pat, gen)
+
+  type rule = Rule : ('a Angstrom.t * ('a -> string list)) -> rule
+
+  let border_side_rule =
+    let parse =
+      let open Angstrom in
+      string "border-" *> Var.side.parser
+    in
+    let yield side =
+      let$ side = Var.side.value side in
+      [ str [ "border-"; side; "-width: 1px;" ] ]
+    in
+    Rule (parse, yield)
+
+  let border_side_color_rule =
+    let parse =
+      let open Angstrom in
+      let* side = string "border-" *> Var.side.parser in
+      let* color = string "-" *> Var.color.parser in
+      return (side, color)
+    in
+    let yield (side, color) =
+      let$ side = Var.side.value side in
+      let$ color = Var.color.value color in
+      [ str [ "border-"; side; "-color: "; color; ";" ] ]
+    in
+    Rule (parse, yield)
+
+  let combine r1 r2 =
+    let (Rule (p1, y1)) = r1 in
+    let (Rule (p2, y2)) = r2 in
+    Angstrom.(map p1 ~f:y1 <|> map p2 ~f:y2 <* end_of_input)
 
   let border_side =
     let pat = Const ("border-", Var (Var.side, End)) in
@@ -247,10 +299,6 @@ end
 module Gen = struct
   (* Spacing *)
 
-  module type Padding = sig
-    val p : int -> Css.property
-  end
-
   type side = [ `t | `r | `b | `l ]
   type axis = [ `x | `y ]
   type logical = [ `s | `e ]
@@ -279,18 +327,6 @@ module Gen = struct
     module Syntax : sig
       val ( let* ) : 'a t -> ('a -> 'b t) -> 'bt
     end
-  end
-
-  module Parser = struct
-    include (val failwith "TODO" : Parser)
-  end
-
-  include struct
-    open Parser.Syntax
-
-    let border =
-      let* () = Parser.const "border" in
-      Parser.return ()
   end
 
   let border parts =
@@ -356,3 +392,5 @@ module Gen = struct
       ]
   end
 end
+
+let parse p str = Angstrom.parse_string ~consume:Prefix p str

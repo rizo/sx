@@ -1,2 +1,4 @@
 (library
-  (name sx))
+  (name sx)
+  (libraries angstrom))
+

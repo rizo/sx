@@ -1,5 +1,36 @@
+open Printf
+
 let digit = [%sedlex.regexp? '0' .. '9']
 let number = [%sedlex.regexp? Plus digit]
+
+(* let side = [%sedlex.regexp? 'x' | 'y' | 's' | 'e' | 't' | 'r' | 'b' | 'l'] *)
+let side = [%sedlex.regexp? Chars "xysetrbl"]
+
+let parse_side buf =
+  let out x = x in
+  match%sedlex buf with
+  | 'x' -> out `x
+  | 'y' -> out `y
+  | 's' -> out `s
+  | 'e' -> out `e
+  | 't' -> out `t
+  | 'r' -> out `r
+  | 'b' -> out `b
+  | 'l' -> out `l
+  | _ -> failwith "invalid margin"
+
+let parse_border buf =
+  match%sedlex buf with
+  | eof -> printf "BORDER\n"
+  | Chars "xysetrbl" ->
+    let x = Sedlexing.Latin1.lexeme buf in
+    printf "%s\n" x
+  | _ -> failwith "invalid border"
+
+let parse buf =
+  match%sedlex buf with
+  | "border" -> parse_border buf
+  | _ -> failwith "invalid"
 
 let read_margin buf =
   match%sedlex buf with

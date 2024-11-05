@@ -4,5 +4,6 @@ depends: [
   "ocaml"
   "dune"
   "sedlex"
+  "angstrom"
   "lambdasoup" {with-test}
 ]

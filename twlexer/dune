@@ -1,0 +1,6 @@
+(ocamllex lex)
+
+(library
+ (name twlexer)
+ (libraries ))
+

@@ -3,10 +3,26 @@
    "repositories": [
      {
        "url": "https://github.com/ocaml/opam-repository.git",
-       "rev": "2dff29abd6cda0706f80503db11dd4af4e7db559"
+       "rev": "8582dee8ae9e16724d00de6220a5f0d2080647aa"
      }
    ],
    "packages" : {
+     "angstrom": {
+       "version": "0.16.1",
+       "src": {
+         "url": "https://github.com/inhabitedtype/angstrom/archive/0.16.1.tar.gz",
+         "sha256": "143536fb4d049574c539b9990840615e078ed3dd94e1d24888293f68349a100b"
+       },
+       "depends": [
+         "bigstringaf",
+         "dune",
+         "ocaml"
+       ],
+       "build-depends": [
+         "dune",
+         "ocaml-syntax-shims"
+       ]
+     },
      "astring": {
        "version": "0.8.5",
        "src": {
@@ -70,6 +86,22 @@
      },
      "base-unix": {
        "version": "base"
+     },
+     "bigstringaf": {
+       "version": "0.10.0",
+       "src": {
+         "url": "https://github.com/inhabitedtype/bigstringaf/archive/0.10.0.tar.gz",
+         "sha256": "0a4zfb1plzvcq42rfkxfm4bkg3q6n5clswzczkgbj4dwbyqgb4pd"
+       },
+       "depends": [
+         "dune",
+         "dune-configurator",
+         "ocaml"
+       ],
+       "build-depends": [
+         "dune",
+         "dune-configurator"
+       ]
      },
      "camlp-streams": {
        "version": "5.0.1",
@@ -510,6 +542,20 @@
          "dune"
        ]
      },
+     "ocaml-syntax-shims": {
+       "version": "1.0.0",
+       "src": {
+         "url": "https://github.com/ocaml-ppx/ocaml-syntax-shims/releases/download/1.0.0/ocaml-syntax-shims-1.0.0.tbz",
+         "sha256": "89b2e193e90a0c168b6ec5ddf6fef09033681bdcb64e11913c97440a2722e8c8"
+       },
+       "depends": [
+         "dune",
+         "ocaml"
+       ],
+       "build-depends": [
+         "dune"
+       ]
+     },
      "ocaml-system": {
        "version": "5.2.0",
        "src-extra": {
@@ -892,6 +938,7 @@
        "version": "dev",
        "src": { "url": "file://." },
        "depends": [
+         "angstrom",
          "dune",
          "ocaml",
          "sedlex"
