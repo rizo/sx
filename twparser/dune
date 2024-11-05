@@ -1,0 +1,6 @@
+(executable
+ (name twparser)
+ (libraries sedlex)
+ (preprocess (pps sedlex.ppx))
+ ;(flags :standard -w +39)
+)

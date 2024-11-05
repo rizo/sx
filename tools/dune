@@ -1,0 +1,3 @@
+(executable
+  (name tw_get_rules)
+  (libraries lambdasoup unix))

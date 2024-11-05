@@ -1,0 +1,8 @@
+opam-version: "2.0"
+
+depends: [
+  "ocaml"
+  "dune"
+  "sedlex"
+  "lambdasoup" {with-test}
+]
