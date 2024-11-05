@@ -1,4 +1,4 @@
 (executable
   (name test)
-  (libraries sx twlexer))
+  (libraries sx twlexer fmt))
 

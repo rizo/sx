@@ -2,5 +2,5 @@
 
 (library
  (name twlexer)
- (libraries ))
+ (libraries fmt))
 

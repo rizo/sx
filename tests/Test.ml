@@ -12,8 +12,12 @@ let _1 () =
 
 let print input =
   let lexbuf = Lexing.from_string input in
-  let actual = Twlexer.Lex.read lexbuf in
-  printf "%S => %S\n" input actual
+  try
+    let out = Twlexer.Lex.read lexbuf in
+    Fmt.pr "%a@." Twlexer.Css_output.pp out;
+    (* printf "%S => %S\n" input actual *)
+    ()
+  with exn -> printf "error: %S: %s\n" input (Printexc.to_string exn)
 
 let cases =
   [
@@ -90,6 +94,9 @@ let cases =
     "fill-sky-50";
     "stroke-gray-600";
     "stroke-2";
+    "md:border-t";
+    "hover:bg-red-100";
+    "mt-0 pb-2";
   ]
 
 let () =

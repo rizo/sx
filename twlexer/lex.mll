@@ -1,6 +1,41 @@
 {
   let ( let* ) xs f = List.concat_map f xs
+
+  let string_of_scope scope =
+    match scope with
+    | `sm -> "sm"
+    | `md -> "md"
+    | `lg -> "lg"
+    | `xl -> "xl"
+    | `xl2 -> "2xl"
+
+  let make_selector_name ~scope ~variants ~utility =
+    match (scope, variants) with
+    | None, [] -> utility
+    | Some scope, [] -> string_of_scope scope ^ "\\:" ^ utility
+    | _ ->
+      let selector_prefix =
+        Option.fold scope ~none:variants ~some:(fun scope ->
+            string_of_scope scope :: variants)
+      in
+      let name = String.concat "\\:" selector_prefix ^ "\\:" ^ utility in
+      name ^ ":" ^ String.concat ":" variants
 }
+
+let pseudo_class_variant =
+    "hover"
+  | "focus"
+  | "active"
+  | "focus-within"
+  | "focus-visible"
+  | "motion-safe"
+  | "disabled"
+  | "visited"
+  | "checked"
+  | "first"
+  | "last"
+  | "odd"
+  | "even"
 
 let side = ['x' 'y' 's' 'e' 't' 'r' 'b' 'l']
 
@@ -109,7 +144,7 @@ let border_style =
   | "hidden"
   | "none"
 
-rule read = parse
+rule read_utility = parse
   (* aspect-ratio *)
   | "aspect-auto" { ["aspect-ratio:auto;"] }
   | "aspect-square" { ["aspect-ratio:1 / 1;"] }
@@ -341,13 +376,38 @@ rule read = parse
     ["stroke-width:"; String.make 1 v; ";"]
   }
 
-  | eof { raise End_of_file }
   | _ as unexpected { invalid_arg (String.make 1 unexpected) }
 
 
+and read out scope variants = parse
+  (* responsive *)
+  | "sm:" { read out (Some `sm) variants lexbuf }
+  | "md:" { read out (Some `md) variants lexbuf }
+  | "lg:" { read out (Some `lg) variants lexbuf }
+  | "xl:" { read out (Some `xl) variants lexbuf }
+  | "2xl:" { read out (Some `xl2) variants lexbuf }
+
+  (* variants *)
+  | (pseudo_class_variant as v) ":" {
+    read out scope (v :: variants) lexbuf
+  }
+
+  | ' ' { read out None [] lexbuf }
+
+  | eof { out }
+  | "" {
+    let i = lexbuf.lex_curr_pos in
+    let properties = String.concat "" (read_utility lexbuf) in
+    let j = lexbuf.lex_curr_pos in
+    let utility = Bytes.to_string (Bytes.sub lexbuf.lex_buffer i (j - i)) in
+    (* Fmt.pr "LEX: i=%d j=%d %s %S@." i j (Bytes.to_string lexbuf.lex_buffer) utility; *)
+    let selector = make_selector_name ~scope ~variants ~utility in
+    let out' = Css_output.add ~scope ~selector ~properties out in
+    read out' scope variants lexbuf
+  }
+
 {
   let read lexbuf =
-    let out = String.concat "" (read lexbuf) in
-    try ignore (read lexbuf); invalid_arg "letfover input" with
-    | End_of_file -> out
+   let out = read Css_output.empty None [] lexbuf in
+   out
 }
