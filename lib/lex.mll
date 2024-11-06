@@ -1,25 +1,7 @@
 {
   let ( let* ) xs f = List.concat_map f xs
 
-  let string_of_scope scope =
-    match scope with
-    | `sm -> "sm"
-    | `md -> "md"
-    | `lg -> "lg"
-    | `xl -> "xl"
-    | `xl2 -> "2xl"
-
-  let make_selector_name ~scope ~variants ~utility =
-    match (scope, variants) with
-    | None, [] -> utility
-    | Some scope, [] -> string_of_scope scope ^ "\\:" ^ utility
-    | _ ->
-      let selector_prefix =
-        Option.fold scope ~none:variants ~some:(fun scope ->
-            string_of_scope scope :: variants)
-      in
-      let name = String.concat "\\:" selector_prefix ^ "\\:" ^ utility in
-      name ^ ":" ^ String.concat ":" variants
+  exception Non_utility
 }
 
 let pseudo_class_variant =
@@ -143,6 +125,14 @@ let border_style =
   | "double"
   | "hidden"
   | "none"
+
+(* Chars that delimit utility names.
+  If a utility name is not delimited by one of these, it will NOT be treated as
+  a valid utility. EOF is treated as a delimiter in the lexer.
+  
+  The '|' char is not supported by the official tailwindcss CLI, but we add it to
+  allow matching utilities in OCaml `{|...|}` strings. *)
+let delim = ' ' | '\n' | '\t' | '\"' | '\'' | '|'
 
 rule read_utility = parse
   (* aspect-ratio *)
@@ -376,15 +366,28 @@ rule read_utility = parse
     ["stroke-width:"; String.make 1 v; ";"]
   }
 
-  | _ as unexpected { invalid_arg (String.make 1 unexpected) }
+  (* custom *)
+  | '[' ([^ '[' ']']+ as v) ']' {
+    [v; ";"]
+  }
+
+  | _ { skip_non_utility lexbuf }
+
+and read_delim = parse
+  | delim | eof { true }
+  | _ { false }
+
+and skip_non_utility = parse
+  | delim  { raise Non_utility }
+  | _ { skip_non_utility lexbuf }
 
 
 and read out scope variants = parse
   (* responsive *)
-  | "sm:" { read out (Some `sm) variants lexbuf }
-  | "md:" { read out (Some `md) variants lexbuf }
-  | "lg:" { read out (Some `lg) variants lexbuf }
-  | "xl:" { read out (Some `xl) variants lexbuf }
+  | "sm:"  { read out (Some `sm) variants lexbuf }
+  | "md:"  { read out (Some `md) variants lexbuf }
+  | "lg:"  { read out (Some `lg) variants lexbuf }
+  | "xl:"  { read out (Some `xl) variants lexbuf }
   | "2xl:" { read out (Some `xl2) variants lexbuf }
 
   (* variants *)
@@ -392,22 +395,26 @@ and read out scope variants = parse
     read out scope (v :: variants) lexbuf
   }
 
-  | ' ' { read out None [] lexbuf }
+  | delim+ { read out None [] lexbuf }
 
   | eof { out }
   | "" {
-    let i = lexbuf.lex_curr_pos in
-    let properties = String.concat "" (read_utility lexbuf) in
-    let j = lexbuf.lex_curr_pos in
-    let utility = Bytes.to_string (Bytes.sub lexbuf.lex_buffer i (j - i)) in
-    (* Fmt.pr "LEX: i=%d j=%d %s %S@." i j (Bytes.to_string lexbuf.lex_buffer) utility; *)
-    let selector = make_selector_name ~scope ~variants ~utility in
-    let out' = Css_output.add ~scope ~selector ~properties out in
-    read out' scope variants lexbuf
+    try
+      let i = lexbuf.lex_curr_pos in
+      let properties = String.concat "" (read_utility lexbuf) in
+      let j = lexbuf.lex_curr_pos in
+      let has_delim = read_delim lexbuf in
+      if has_delim then
+        let utility = Bytes.to_string (Bytes.sub lexbuf.lex_buffer i (j - i)) in
+        let selector = Css.make_selector_name ~scope ~variants ~utility in
+        let out' = Css.add ~scope ~selector ~properties out in
+        read out' None [] lexbuf
+      else
+        read out None [] lexbuf
+    with
+    | Non_utility -> read out scope variants lexbuf
   }
 
 {
-  let read lexbuf =
-   let out = read Css_output.empty None [] lexbuf in
-   out
+  let read lexbuf = read Css.empty None [] lexbuf
 }

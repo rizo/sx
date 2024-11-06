@@ -49,7 +49,7 @@ let pp formatter self =
       pp_scope
   in
   if not (String_map.is_empty self.global) then
-    Format.fprintf formatter "%a" pp_scope self.global;
+    Format.fprintf formatter "%a@." pp_scope self.global;
   if not (String_map.is_empty self.sm) then pp_media 640 self.sm;
   if not (String_map.is_empty self.md) then pp_media 768 self.md;
   if not (String_map.is_empty self.lg) then pp_media 1024 self.lg;
@@ -68,3 +68,34 @@ let union self other =
     xl = String_map.union combine self.xl other.xl;
     xl2 = String_map.union combine self.xl2 other.xl2;
   }
+
+let string_of_scope scope =
+  match scope with
+  | `sm -> "sm"
+  | `md -> "md"
+  | `lg -> "lg"
+  | `xl -> "xl"
+  | `xl2 -> "2xl"
+
+let chars_that_need_escaping = Char_set.of_list [ ':'; '['; ']'; '('; ')'; '&' ]
+
+let make_selector_name ~scope ~variants ~utility =
+  let utility =
+    let buf = Buffer.create (String.length utility + 4) in
+    String.iter
+      (fun x ->
+        if Char_set.mem x chars_that_need_escaping then Buffer.add_char buf '\\';
+        Buffer.add_char buf x)
+      utility;
+    Buffer.contents buf
+  in
+  match (scope, variants) with
+  | None, [] -> utility
+  | Some scope, [] -> string_of_scope scope ^ "\\:" ^ utility
+  | _ ->
+    let selector_prefix =
+      Option.fold scope ~none:variants ~some:(fun scope ->
+          string_of_scope scope :: variants)
+    in
+    let name = String.concat "\\:" selector_prefix ^ "\\:" ^ utility in
+    name ^ ":" ^ String.concat ":" variants

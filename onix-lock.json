@@ -3,26 +3,10 @@
    "repositories": [
      {
        "url": "https://github.com/ocaml/opam-repository.git",
-       "rev": "8582dee8ae9e16724d00de6220a5f0d2080647aa"
+       "rev": "d910b0617a51ea90e4547db13a509962fc504f70"
      }
    ],
    "packages" : {
-     "angstrom": {
-       "version": "0.16.1",
-       "src": {
-         "url": "https://github.com/inhabitedtype/angstrom/archive/0.16.1.tar.gz",
-         "sha256": "143536fb4d049574c539b9990840615e078ed3dd94e1d24888293f68349a100b"
-       },
-       "depends": [
-         "bigstringaf",
-         "dune",
-         "ocaml"
-       ],
-       "build-depends": [
-         "dune",
-         "ocaml-syntax-shims"
-       ]
-     },
      "astring": {
        "version": "0.8.5",
        "src": {
@@ -86,22 +70,6 @@
      },
      "base-unix": {
        "version": "base"
-     },
-     "bigstringaf": {
-       "version": "0.10.0",
-       "src": {
-         "url": "https://github.com/inhabitedtype/bigstringaf/archive/0.10.0.tar.gz",
-         "sha256": "0a4zfb1plzvcq42rfkxfm4bkg3q6n5clswzczkgbj4dwbyqgb4pd"
-       },
-       "depends": [
-         "dune",
-         "dune-configurator",
-         "ocaml"
-       ],
-       "build-depends": [
-         "dune",
-         "dune-configurator"
-       ]
      },
      "camlp-streams": {
        "version": "5.0.1",
@@ -309,21 +277,6 @@
          "topkg"
        ]
      },
-     "gen": {
-       "version": "1.1",
-       "src": {
-         "url": "https://github.com/c-cube/gen/archive/v1.1.tar.gz",
-         "sha512": "71a4b5c3666a7c11935398a78feea7383f61d2c549dfb96e324d40783ffa87b5ec492c5ec468803aabfb9b48e7d0ebaa30b24d2b974540afc7cca5feea3121c1"
-       },
-       "depends": [
-         "dune",
-         "ocaml",
-         "seq"
-       ],
-       "build-depends": [
-         "dune"
-       ]
-     },
      "host-arch-unknown": {
        "version": "1"
      },
@@ -475,20 +428,6 @@
          "ocaml-system"
        ]
      },
-     "ocaml-compiler-libs": {
-       "version": "v0.17.0",
-       "src": {
-         "url": "https://github.com/janestreet/ocaml-compiler-libs/archive/refs/tags/v0.17.0.tar.gz",
-         "sha512": "c5cd418b0eb74e00c3f63235754bbdb3a3328ac743d6ae885424d8c50b4edaa7068572e689cb3456d222793283927f2984a1ff840b1bc3817f810b5314faf897"
-       },
-       "depends": [
-         "dune",
-         "ocaml"
-       ],
-       "build-depends": [
-         "dune"
-       ]
-     },
      "ocaml-config": {
        "version": "3",
        "src-extra": {
@@ -554,20 +493,6 @@
          "stdune",
          "xdg",
          "yojson"
-       ],
-       "build-depends": [
-         "dune"
-       ]
-     },
-     "ocaml-syntax-shims": {
-       "version": "1.0.0",
-       "src": {
-         "url": "https://github.com/ocaml-ppx/ocaml-syntax-shims/releases/download/1.0.0/ocaml-syntax-shims-1.0.0.tbz",
-         "sha256": "89b2e193e90a0c168b6ec5ddf6fef09033681bdcb64e11913c97440a2722e8c8"
-       },
-       "depends": [
-         "dune",
-         "ocaml"
        ],
        "build-depends": [
          "dune"
@@ -767,20 +692,6 @@
          "dune"
        ]
      },
-     "ppx_derivers": {
-       "version": "1.2.1",
-       "src": {
-         "url": "https://github.com/ocaml-ppx/ppx_derivers/archive/1.2.1.tar.gz",
-         "sha256": "b6595ee187dea792b31fc54a0e1524ab1e48bc6068d3066c45215a138cc73b95"
-       },
-       "depends": [
-         "dune",
-         "ocaml"
-       ],
-       "build-depends": [
-         "dune"
-       ]
-     },
      "ppx_yojson_conv_lib": {
        "version": "v0.17.0",
        "src": {
@@ -791,24 +702,6 @@
          "dune",
          "ocaml",
          "yojson"
-       ],
-       "build-depends": [
-         "dune"
-       ]
-     },
-     "ppxlib": {
-       "version": "0.33.1~5.3preview",
-       "src": {
-         "url": "https://github.com/ocaml-ppx/ppxlib/archive/ac7fcfc88d574609b62cc0a38e0de59d03cc96de.tar.gz",
-         "sha256": "d679f110b92ed12156556ee1d3779d11cef605c36f0bc417943e7996f0d2bbaf"
-       },
-       "depends": [
-         "dune",
-         "ocaml",
-         "ocaml-compiler-libs",
-         "ppx_derivers",
-         "sexplib0",
-         "stdlib-shims"
        ],
        "build-depends": [
          "dune"
@@ -838,22 +731,6 @@
        "depends": [
          "dune",
          "ocaml"
-       ],
-       "build-depends": [
-         "dune"
-       ]
-     },
-     "sedlex": {
-       "version": "3.3",
-       "src": {
-         "url": "https://github.com/ocaml-community/sedlex/archive/refs/tags/v3.3.tar.gz",
-         "sha512": "791b172b59256cb77df1bbd9e3136aa79e65bcb3df1f64bbe10933d624bad59a7d8b358c35abd07c267b89a3feb01f935e927ffc4fe9c6eb2ac6637cfa9b42cd"
-       },
-       "depends": [
-         "dune",
-         "gen",
-         "ocaml",
-         "ppxlib"
        ],
        "build-depends": [
          "dune"
@@ -918,20 +795,6 @@
          "dune"
        ]
      },
-     "stdlib-shims": {
-       "version": "0.3.0",
-       "src": {
-         "url": "https://github.com/ocaml/stdlib-shims/releases/download/0.3.0/stdlib-shims-0.3.0.tbz",
-         "sha256": "babf72d3917b86f707885f0c5528e36c63fccb698f4b46cf2bab5c7ccdd6d84a"
-       },
-       "depends": [
-         "dune",
-         "ocaml"
-       ],
-       "build-depends": [
-         "dune"
-       ]
-     },
      "stdune": {
        "version": "3.16.1",
        "src": {
@@ -955,11 +818,10 @@
        "version": "dev",
        "src": { "url": "file://." },
        "depends": [
-         "angstrom",
+         "cmdliner",
          "dune",
          "fmt",
-         "ocaml",
-         "sedlex"
+         "ocaml"
        ],
        "build-depends": [
          "dune"

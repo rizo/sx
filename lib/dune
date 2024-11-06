@@ -1,6 +1,6 @@
 (ocamllex lex)
 
 (library
- (name twlexer)
+ (name sx)
  (libraries fmt))
 

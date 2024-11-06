@@ -1,4 +1,3 @@
-(executable
-  (name test)
-  (libraries sx twlexer fmt))
+(cram
+ (deps %{bin:sx}))
 

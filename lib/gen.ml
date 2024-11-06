@@ -1,9 +1,4 @@
-open struct
-  let fmt = Format.asprintf
-  let str ?(sep = "") parts = String.concat sep parts
-end
-
-(* vars *)
+open Prelude
 
 let side x =
   match x with
@@ -34,7 +29,7 @@ let size x =
   | "7xl" -> [ "80rem" ]
   | _ -> invalid_arg ("invalid size: " ^ x)
 
-let px x = [x ^ "px"]
+let px x = [ x ^ "px" ]
 
 let len x =
   match x with
