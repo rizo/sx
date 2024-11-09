@@ -2,6 +2,16 @@
   let ( let* ) xs f = List.concat_map f xs
 
   exception Non_utility
+
+  type state = {
+    scope : [ `sm | `md | `lg | `xl | `xl2] option;
+    variants : string list;
+  }
+
+  let init = {
+    scope = None;
+    variants = [];
+  }
 }
 
 let pseudo_class_variant =
@@ -134,7 +144,7 @@ let border_style =
   allow matching utilities in OCaml `{|...|}` strings. *)
 let delim = ' ' | '\n' | '\t' | '\"' | '\'' | '|'
 
-rule read_utility = parse
+rule read_utility state = parse
   (* aspect-ratio *)
   | "aspect-auto" { ["aspect-ratio:auto;"] }
   | "aspect-square" { ["aspect-ratio:1 / 1;"] }
@@ -210,11 +220,9 @@ rule read_utility = parse
   }
 
   (* position *)
-  | "static" as v { ["position:"; v; ";"] }
-  | "fixed" as v { ["position:"; v;  ";"] }
-  | "absolute" as v { ["position:"; v; ";"] }
-  | "relative" as v { ["position:"; v; ";"] }
-  | "sticky" as v { ["position:"; v; ";"] }
+  | "static" | "fixed" | "absolute" | "relative" | "sticky" as v {
+    ["position:"; v; ";"]
+  }
 
   (* margin *)
   | ("-"? as minus) "m-" ((len | auto) as len) {
@@ -367,54 +375,54 @@ rule read_utility = parse
   }
 
   (* custom *)
-  | '[' ([^ '[' ']']+ as v) ']' {
+  (*| '[' ([^ '[' ']']+ as v) ']' {
     [v; ";"]
-  }
+  }*)
 
-  | _ { skip_non_utility lexbuf }
+  | _ { skip_non_utility state lexbuf }
 
-and read_delim = parse
+and has_delim = parse
   | delim | eof { true }
   | _ { false }
 
-and skip_non_utility = parse
-  | delim  { raise Non_utility }
-  | _ { skip_non_utility lexbuf }
+and skip_non_utility state = parse
+  | delim  {
+    raise Non_utility
+  }
+  | _ { skip_non_utility state lexbuf }
 
 
-and read out scope variants = parse
+and read state out = parse
   (* responsive *)
-  | "sm:"  { read out (Some `sm) variants lexbuf }
-  | "md:"  { read out (Some `md) variants lexbuf }
-  | "lg:"  { read out (Some `lg) variants lexbuf }
-  | "xl:"  { read out (Some `xl) variants lexbuf }
-  | "2xl:" { read out (Some `xl2) variants lexbuf }
+  | "sm:"  { read { state with scope = Some `sm } out lexbuf }
+  | "md:"  { read { state with scope = Some `md } out lexbuf }
+  | "lg:"  { read { state with scope = Some `lg } out lexbuf }
+  | "xl:"  { read { state with scope = Some `xl } out lexbuf }
+  | "2xl:" { read { state with scope = Some `xl2 } out lexbuf }
 
   (* variants *)
   | (pseudo_class_variant as v) ":" {
-    read out scope (v :: variants) lexbuf
+    read { state with variants = v :: state.variants } out lexbuf
   }
 
-  | delim+ { read out None [] lexbuf }
+  | delim+ { read init out lexbuf }
 
   | eof { out }
   | "" {
     try
-      let i = lexbuf.lex_curr_pos in
-      let properties = String.concat "" (read_utility lexbuf) in
-      let j = lexbuf.lex_curr_pos in
-      let has_delim = read_delim lexbuf in
-      if has_delim then
-        let utility = Bytes.to_string (Bytes.sub lexbuf.lex_buffer i (j - i)) in
-        let selector = Css.make_selector_name ~scope ~variants ~utility in
-        let out' = Css.add ~scope ~selector ~properties out in
-        read out' None [] lexbuf
+      let properties = String.concat "" (read_utility state lexbuf) in
+      let utility = Lexing.lexeme lexbuf in
+      if has_delim lexbuf then
+        let selector = Css.make_selector_name ~scope:state.scope ~variants:state.variants ~utility in
+        let out' = Css.add ~scope:state.scope ~selector ~properties out in
+        read init out' lexbuf
       else
-        read out None [] lexbuf
+        read init out lexbuf
     with
-    | Non_utility -> read out scope variants lexbuf
+    | Non_utility -> read state out lexbuf
   }
 
 {
-  let read lexbuf = read Css.empty None [] lexbuf
+  let read lexbuf =
+    read init Css.empty lexbuf
 }
