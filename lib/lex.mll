@@ -379,16 +379,14 @@ rule read_utility state = parse
     [v; ";"]
   }*)
 
-  | _ { skip_non_utility state lexbuf }
+  | _ { raise Non_utility }
 
 and has_delim = parse
   | delim | eof { true }
   | _ { false }
 
 and skip_non_utility state = parse
-  | delim  {
-    raise Non_utility
-  }
+  | delim { () }
   | _ { skip_non_utility state lexbuf }
 
 
@@ -419,7 +417,9 @@ and read state out = parse
       else
         read init out lexbuf
     with
-    | Non_utility -> read state out lexbuf
+    | Non_utility ->
+      skip_non_utility state lexbuf;
+      read state out lexbuf
   }
 
 {

@@ -1,5 +1,3 @@
-open Prelude
-
 let side x =
   match x with
   | 'x' -> [ "left"; "right" ]
