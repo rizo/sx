@@ -17,3 +17,5 @@ let read_string str =
 let read_channel chan =
   let lexbuf = Lexing.from_channel chan in
   Lex.read lexbuf
+
+include (val failwith "Types.CSS: TODO" : Types.Css)

@@ -5,5 +5,8 @@ depends: [
   "dune"
   "cmdliner"
   "fmt"
+  "dune-action-plugin"
+  "ppxlib" {build}
   "lambdasoup" {with-test}
+  "ocamlformat" {with-test}
 ]

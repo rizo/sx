@@ -6,6 +6,7 @@ let
 
 in onix.env {
   path = ./.;
+  env-file = ./.onix.env;
 
   vars = {
     "with-test" = true;

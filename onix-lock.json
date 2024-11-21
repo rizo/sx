@@ -3,7 +3,7 @@
    "repositories": [
      {
        "url": "https://github.com/ocaml/opam-repository.git",
-       "rev": "d910b0617a51ea90e4547db13a509962fc504f70"
+       "rev": "d4c6a480805e2a9eafb47afe89128b65244cbdac"
      }
    ],
    "packages" : {
@@ -135,6 +135,25 @@
          "ocaml"
        ]
      },
+     "dune-action-plugin": {
+       "version": "3.16.1",
+       "src": {
+         "url": "https://github.com/ocaml/dune/releases/download/3.16.1/dune-3.16.1.tbz",
+         "sha256": "b781ae20f87613c2a11bd0717809e00470c82d615e15264f9a64e033051ac3de"
+       },
+       "depends": [
+         "base-unix",
+         "csexp",
+         "dune",
+         "dune-glob",
+         "dune-private-libs",
+         "dune-rpc",
+         "stdune"
+       ],
+       "build-depends": [
+         "dune"
+       ]
+     },
      "dune-build-info": {
        "version": "3.16.1",
        "src": {
@@ -160,6 +179,41 @@
          "csexp",
          "dune",
          "ocaml"
+       ],
+       "build-depends": [
+         "dune"
+       ]
+     },
+     "dune-glob": {
+       "version": "3.16.1",
+       "src": {
+         "url": "https://github.com/ocaml/dune/releases/download/3.16.1/dune-3.16.1.tbz",
+         "sha256": "b781ae20f87613c2a11bd0717809e00470c82d615e15264f9a64e033051ac3de"
+       },
+       "depends": [
+         "dune",
+         "dune-private-libs",
+         "dyn",
+         "ordering",
+         "stdune"
+       ],
+       "build-depends": [
+         "dune"
+       ]
+     },
+     "dune-private-libs": {
+       "version": "3.16.1",
+       "src": {
+         "url": "https://github.com/ocaml/dune/releases/download/3.16.1/dune-3.16.1.tbz",
+         "sha256": "b781ae20f87613c2a11bd0717809e00470c82d615e15264f9a64e033051ac3de"
+       },
+       "depends": [
+         "csexp",
+         "dune",
+         "dyn",
+         "ocaml",
+         "pp",
+         "stdune"
        ],
        "build-depends": [
          "dune"
@@ -428,6 +482,20 @@
          "ocaml-system"
        ]
      },
+     "ocaml-compiler-libs": {
+       "version": "v0.17.0",
+       "src": {
+         "url": "https://github.com/janestreet/ocaml-compiler-libs/archive/refs/tags/v0.17.0.tar.gz",
+         "sha512": "c5cd418b0eb74e00c3f63235754bbdb3a3328ac743d6ae885424d8c50b4edaa7068572e689cb3456d222793283927f2984a1ff840b1bc3817f810b5314faf897"
+       },
+       "depends": [
+         "dune",
+         "ocaml"
+       ],
+       "build-depends": [
+         "dune"
+       ]
+     },
      "ocaml-config": {
        "version": "3",
        "src-extra": {
@@ -692,6 +760,20 @@
          "dune"
        ]
      },
+     "ppx_derivers": {
+       "version": "1.2.1",
+       "src": {
+         "url": "https://github.com/ocaml-ppx/ppx_derivers/archive/1.2.1.tar.gz",
+         "sha256": "b6595ee187dea792b31fc54a0e1524ab1e48bc6068d3066c45215a138cc73b95"
+       },
+       "depends": [
+         "dune",
+         "ocaml"
+       ],
+       "build-depends": [
+         "dune"
+       ]
+     },
      "ppx_yojson_conv_lib": {
        "version": "v0.17.0",
        "src": {
@@ -702,6 +784,24 @@
          "dune",
          "ocaml",
          "yojson"
+       ],
+       "build-depends": [
+         "dune"
+       ]
+     },
+     "ppxlib": {
+       "version": "0.33.1~5.3preview",
+       "src": {
+         "url": "https://github.com/ocaml-ppx/ppxlib/archive/ac7fcfc88d574609b62cc0a38e0de59d03cc96de.tar.gz",
+         "sha256": "d679f110b92ed12156556ee1d3779d11cef605c36f0bc417943e7996f0d2bbaf"
+       },
+       "depends": [
+         "dune",
+         "ocaml",
+         "ocaml-compiler-libs",
+         "ppx_derivers",
+         "sexplib0",
+         "stdlib-shims"
        ],
        "build-depends": [
          "dune"
@@ -795,6 +895,20 @@
          "dune"
        ]
      },
+     "stdlib-shims": {
+       "version": "0.3.0",
+       "src": {
+         "url": "https://github.com/ocaml/stdlib-shims/releases/download/0.3.0/stdlib-shims-0.3.0.tbz",
+         "sha256": "babf72d3917b86f707885f0c5528e36c63fccb698f4b46cf2bab5c7ccdd6d84a"
+       },
+       "depends": [
+         "dune",
+         "ocaml"
+       ],
+       "build-depends": [
+         "dune"
+       ]
+     },
      "stdune": {
        "version": "3.16.1",
        "src": {
@@ -820,11 +934,13 @@
        "depends": [
          "cmdliner",
          "dune",
+         "dune-action-plugin",
          "fmt",
          "ocaml"
        ],
        "build-depends": [
-         "dune"
+         "dune",
+         "ppxlib"
        ],
        "test-depends": [
          "lambdasoup"

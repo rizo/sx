@@ -1,0 +1,4 @@
+(executable
+  (name plugin)
+  (public_name sx_plugin)
+  (libraries dune-action-plugin dune-glob))

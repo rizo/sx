@@ -1,0 +1,30 @@
+(executable
+ (name run)
+ (modules run)
+ (libraries ppxlib sx.ppx))
+
+(test
+ (name input)
+ (libraries sx)
+ (preprocess
+  (pps sx.ppx)))
+
+(rule
+ (target output.ml.actual)
+ (deps
+  (:run run.exe)
+  (:input input.ml))
+ (action
+  (with-outputs-to
+   %{target}
+   (pipe-stdout
+    (run ./%{run} --impl %{input})
+    (run ocamlformat --exp-grouping=preserve --impl -)))))
+
+(rule
+ (alias runtest)
+ (deps
+  (file output.ml)
+  (file output.ml.actual))
+ (action
+  (diff output.ml output.ml.actual)))
