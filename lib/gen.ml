@@ -1,15 +1,3 @@
-let side x =
-  match x with
-  | 'x' -> [ "left"; "right" ]
-  | 'y' -> [ "top"; "bottom" ]
-  | 's' -> [ "inline-start" ]
-  | 'e' -> [ "inline-end" ]
-  | 't' -> [ "top" ]
-  | 'r' -> [ "right" ]
-  | 'b' -> [ "bottom" ]
-  | 'l' -> [ "left" ]
-  | _ -> invalid_arg ("invalid side: " ^ String.make 1 x)
-
 let size x =
   match x with
   | "3xs" -> [ "16rem" ]
@@ -26,6 +14,18 @@ let size x =
   | "6xl" -> [ "72rem" ]
   | "7xl" -> [ "80rem" ]
   | _ -> invalid_arg ("invalid size: " ^ x)
+
+let side x =
+  match x with
+  | 'x' -> [ "left"; "right" ]
+  | 'y' -> [ "top"; "bottom" ]
+  | 's' -> [ "inline-start" ]
+  | 'e' -> [ "inline-end" ]
+  | 't' -> [ "top" ]
+  | 'r' -> [ "right" ]
+  | 'b' -> [ "bottom" ]
+  | 'l' -> [ "left" ]
+  | _ -> invalid_arg ("invalid side: " ^ String.make 1 x)
 
 let px x = [ x ^ "px" ]
 

@@ -1,4 +1,4 @@
 (executable
-  (name plugin)
-  (public_name sx_plugin)
+  (name gen)
+  (public_name sx_gen)
   (libraries dune-action-plugin dune-glob))

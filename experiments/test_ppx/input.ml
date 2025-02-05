@@ -2,6 +2,8 @@ module Theme = struct
   let basePadding = 3
 end
 
+let%static x = 1
+
 module Style = struct
   (* Basic styles *)
   let base =
@@ -42,4 +44,11 @@ module Style = struct
 end
 
 let () =
-  ignore [ Style.base; Style.highlighted; Style.button; Style.card; Style.s1 ]
+  ignore
+    [
+      (if Random.int 10 > 5 then Style.base else [%css color `blue]);
+      Style.highlighted;
+      Style.button;
+      Style.card;
+      Style.s1;
+    ]
