@@ -157,6 +157,9 @@
   $ sx <<< 'text-stone-300'
   .text-stone-300 { color: oklch(0.869 0.005 56.366); }
 
+  $ sx <<< 'text-red-500'
+  .text-red-500 { color: oklch(0.637 0.237 25.331); }
+
   $ sx <<< 'text-transparent'
   .text-transparent { color: transparent; }
 

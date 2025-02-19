@@ -77,42 +77,6 @@ let size =
 
 let auto = "auto"
 
-let color_base = 
-    "amber"
-  | "blue"
-  | "cyan"
-  | "emerald"
-  | "fuchsia"
-  | "gray"
-  | "green"
-  | "indigo"
-  | "lime"
-  | "neutral"
-  | "orange"
-  | "pink"
-  | "purple"
-  | "red"
-  | "rose"
-  | "sky"
-  | "slate"
-  | "stone"
-  | "teal"
-  | "violet"
-  | "white"
-  | "yellow"
-  | "zinc"
-
-let color_final = 
-    "inherit"
-  | "current"
-  | "transparent"
-  | "black"
-  | "white"
-
-let color_num = "50" | "950" | (['1'-'9'] "00")
-
-let color = (color_final | (color_base "-" color_num)) 
-
 let suffix = (['a'-'z'] | ['0'-'9'] | '-' | '_' )+
 
 let break_inside_value =
@@ -250,22 +214,18 @@ rule read_utility state gen = parse
   }
 
   (* text *)
-  | "text-" (color as color) {
+  | "text-" (suffix as color) {
     let* color = Gen.color gen color in
     ["color: "; color; ";"]
   }
 
-  (* text *)
-  | "decoration-" (color as color) {
+  (* decoration *)
+  | "decoration-" (suffix as color) {
     let* color = Gen.color gen color in
     ["text-decoration-color: "; color; ";"]
   }
 
   (* bg *)
-  | "bg-" (color as color) {
-    let* color = Gen.color gen color in
-    ["background-color: "; color; ";"]
-  }
   | "bg-origin-" ("border" | "padding" | "content" as v) { ["background-origin: "; v; "-box;"] }
   | "bg-" ("bottom" | "left" | "left-bottom" | "left-top" | "right" | "right-bottom" | "right-top" | "top" as v) {
     let v = String.map (function '-' -> ' ' | x -> x) v in
@@ -276,6 +236,10 @@ rule read_utility state gen = parse
   | "bg-repeat-" ( "x" | "y" | "round" | "space" as v) { ["background-repeat:repeat-"; v; ";"] }
   | "bg-" ("auto" | "cover" | "contain" as v) { ["background-size: "; v;";"] }
   | "bg-none" { ["background-image:none;"] }
+  | "bg-" (suffix as color) {
+    let* color = Gen.color gen color in
+    ["background-color: "; color; ";"]
+  }
 
   (* border *)
   | "border" { ["border-width: 1px;"] }
@@ -283,10 +247,6 @@ rule read_utility state gen = parse
   | "border-" (side as side) {
     let* side = Gen.side gen (String.make 1 side) in
     ["border-"; side; "-width: 1px;"]
-  }
-  | "border-" (color as color) {
-    let* color = Gen.color gen color in
-    ["border-color: "; color; ";"]
   }
   | "border-" ('0' | '2' | '4' | '8' as px) {
     let* px = Gen.px (String.make 1 px) in
@@ -297,26 +257,30 @@ rule read_utility state gen = parse
     let* px = Gen.px (String.make 1 px) in
     ["border-"; side; "-width: "; px; ";"]
   }
-  | "border-" (side as side) "-" (color as color) {
+  | "border-" (side as side) "-" (suffix as color) {
     let* side = Gen.side gen (String.make 1 side) in
     let* color = Gen.color gen color in
     ["border-"; side; ": "; color; ";"]
   }
+  | "border-" (suffix as color) {
+    let* color = Gen.color gen color in
+    ["border-color: "; color; ";"]
+  }
 
   (* divide *)
-  | "divide-" (color as color) {
+  | "divide-" (suffix as color) {
     let* color = Gen.color gen color in
     ["border-color: "; color; ";"]
   }
 
   (* outline *)
-  | "outline-" (color as color) {
+  | "outline-" (suffix as color) {
     let* color = Gen.color gen color in
     ["outline-color: "; color; ";"]
   }
 
   (* ring *)
-  | "ring-" (color as color) {
+  | "ring-" (suffix as color) {
     let* color = Gen.color gen color in
     ["--sx-ring-color: "; color; ";"]
   }
@@ -333,13 +297,13 @@ rule read_utility state gen = parse
 
   (* accent *)
   | "accent-auto" { ["accent-color:auto;"] }
-  | "accent-" (color as color) {
+  | "accent-" (suffix as color) {
     let* color = Gen.color gen color in
     ["accent-color: "; color; ";"]
   }
 
   (* caret *)
-  | "caret-" (color as color) {
+  | "caret-" (suffix as color) {
     let* color = Gen.color gen color in
     ["caret-color: "; color; ";"]
   }
@@ -367,18 +331,18 @@ rule read_utility state gen = parse
   }
 
   (* fill *)
-  | "fill-" (color as color) {
+  | "fill-" (suffix as color) {
     let* color = Gen.color gen color in
     ["fill: "; color; ";"]
   }
 
   (* stroke *)
-  | "stroke-" (color as color) {
-    let* color = Gen.color gen color in
-    ["stroke: "; color; ";"]
-  }
   | "stroke-" ("0" | "1" | "2" as v) {
     ["stroke-width: "; String.make 1 v; ";"]
+  }
+  | "stroke-" (suffix as color) {
+    let* color = Gen.color gen color in
+    ["stroke: "; color; ";"]
   }
 
   (* custom *)
