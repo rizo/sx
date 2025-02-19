@@ -5,5 +5,6 @@ depends: [
   "dune"
   "cmdliner"
   "fmt"
+  "yojson" # config
   "lambdasoup" {with-test}
 ]

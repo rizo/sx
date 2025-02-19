@@ -3,8 +3,9 @@ module Gen = Gen
 module Css = Css
 
 let read_string str =
+  let gen = Gen.make Theme.default in
   let lexbuf = Lexing.from_string str in
-  Lex.read lexbuf
+  Lex.read gen lexbuf
 
 (* let read_string_list strl =
    if List.is_empty strl then invalid_arg "read_string_list: empty input";
@@ -15,5 +16,6 @@ let read_string str =
    Lex.read lexbuf *)
 
 let read_channel chan =
+  let gen = Gen.make Theme.default in
   let lexbuf = Lexing.from_channel chan in
-  Lex.read lexbuf
+  Lex.read gen lexbuf
