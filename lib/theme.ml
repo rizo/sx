@@ -7,27 +7,57 @@ type default = {
   transition_timing_function : string;
 }
 
-type t = {
-  animate : string String_map.t;
-  aspect : string String_map.t;
-  blur : string String_map.t;
-  breakpoint : string String_map.t;
-  color : string String_map.t;
-  container : string String_map.t;
-  drop_shadow : string String_map.t;
-  ease : string String_map.t;
-  font : string String_map.t;
-  font_weight : string String_map.t;
-  inset_shadow : string String_map.t;
-  leading : string String_map.t;
-  perspective : string String_map.t;
-  radius : string String_map.t;
-  shadow : string String_map.t;
-  spacing : string String_map.t;
-  text_line_height : string String_map.t;
-  text_size : string String_map.t;
-  tracking : string String_map.t;
-}
+module Prelude = struct
+  type theme = {
+    animate : string String_map.t;
+    aspect : string String_map.t;
+    blur : string String_map.t;
+    breakpoint : string String_map.t;
+    color : string String_map.t;
+    size : string String_map.t;
+    drop_shadow : string String_map.t;
+    ease : string String_map.t;
+    font : string String_map.t;
+    font_weight : string String_map.t;
+    inset_shadow : string String_map.t;
+    leading : string String_map.t;
+    perspective : string String_map.t;
+    radius : string String_map.t;
+    shadow : string String_map.t;
+    spacing : float * string;
+    text_line_height : string String_map.t;
+    text_size : string String_map.t;
+    tracking : string String_map.t;
+  }
+end
+
+include Prelude
+
+type t = theme
+
+(* Consider enforcing https://drafts.csswg.org/css-values/#lengths *)
+let parse_spacing input =
+  let invalid_format_err =
+    Invalid_argument "spacing: invalid format, expected: [0-9]+[a-zA-Z]+"
+  in
+  let first_non_digit =
+    try
+      String_ext.find_index
+        (fun c ->
+          match c with
+          | '0' .. '9' | '.' -> false
+          | _ -> true)
+        input
+    with Not_found -> raise invalid_format_err
+  in
+  let num =
+    try float_of_string (String.sub input 0 first_non_digit)
+    with _ -> raise invalid_format_err
+  in
+  let unit =
+    String.sub input first_non_digit (String.length input - first_non_digit)
+  in
+  (num, unit)
 
 let empty =
   {
@@ -42,7 +72,7 @@ let empty =
           ("current", "currentColor");
           ("transparent", "transparent");
         ];
-    container = String_map.empty;
+    size = String_map.empty;
     drop_shadow = String_map.empty;
     ease = String_map.empty;
     font = String_map.empty;
@@ -52,7 +82,7 @@ let empty =
     perspective = String_map.empty;
     radius = String_map.empty;
     shadow = String_map.of_list [ ("none", "0 0 #0000") ];
-    spacing = String_map.empty;
+    spacing = (0.25, "rem");
     text_line_height = String_map.empty;
     text_size = String_map.empty;
     tracking = String_map.empty;
@@ -318,7 +348,6 @@ let default =
       ("white", "#fff");
     ]
   in
-  let spacing = "0.25rem" in
   let breakpoint =
     [
       ("sm", "40rem");
@@ -328,7 +357,7 @@ let default =
       ("2xl", "96rem");
     ]
   in
-  let container =
+  let size =
     [
       ("3xs", "16rem");
       ("2xs", "18rem");
@@ -427,6 +456,9 @@ let default =
     [
       ("2xs", "0 1px var(--sx-shadow-color, rgb(0 0 0 / 0.05))");
       ("xs", "0 1px 2px 0 var(--sx-shadow-color, rgb(0 0 0 / 0.05))");
+      ( "",
+        "0 1px 3px 0 var(--sx-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px \
+         var(--sx-shadow-color, rgb(0 0 0 / 0.1))" );
       ( "sm",
         "0 1px 3px 0 var(--sx-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px \
          var(--sx-shadow-color, rgb(0 0 0 / 0.1))" );
@@ -502,7 +534,7 @@ let default =
     blur = String_map.of_list blur;
     breakpoint = String_map.of_list breakpoint;
     color = String_map.add_seq (List.to_seq color) empty.color;
-    container = String_map.of_list container;
+    size = String_map.of_list size;
     drop_shadow = String_map.of_list drop_shadow;
     ease = String_map.of_list ease;
     font = String_map.of_list font;
@@ -512,7 +544,7 @@ let default =
     perspective = String_map.of_list perspective;
     radius = String_map.of_list radius;
     shadow = String_map.add_seq (List.to_seq shadow) empty.shadow;
-    spacing = String_map.of_list [];
+    spacing = empty.spacing;
     text_line_height = String_map.of_list text_line_height;
     text_size = String_map.of_list text_size;
     tracking = String_map.of_list tracking;
@@ -540,34 +572,31 @@ let of_yojson (json : Yojson.Basic.t) =
   | `Assoc items -> (
     try
       List.fold_left
-        (fun acc (key, values) ->
-          match key with
-          | "animate" -> { acc with animate = add key acc.animate values }
-          | "aspect" -> { acc with aspect = add key acc.aspect values }
-          | "blur" -> { acc with blur = add key acc.blur values }
-          | "breakpoint" ->
-            { acc with breakpoint = add key acc.breakpoint values }
-          | "color" -> { acc with color = add key acc.color values }
-          | "container" -> { acc with container = add key acc.container values }
-          | "drop-shadow" ->
-            { acc with drop_shadow = add key acc.drop_shadow values }
-          | "ease" -> { acc with ease = add key acc.ease values }
-          | "font" -> { acc with font = add key acc.font values }
-          | "font-weight" ->
-            { acc with font_weight = add key acc.font_weight values }
+        (fun acc (k, v) ->
+          match k with
+          | "animate" -> { acc with animate = add k acc.animate v }
+          | "aspect" -> { acc with aspect = add k acc.aspect v }
+          | "blur" -> { acc with blur = add k acc.blur v }
+          | "breakpoint" -> { acc with breakpoint = add k acc.breakpoint v }
+          | "color" -> { acc with color = add k acc.color v }
+          | "size" -> { acc with size = add k acc.size v }
+          | "drop-shadow" -> { acc with drop_shadow = add k acc.drop_shadow v }
+          | "ease" -> { acc with ease = add k acc.ease v }
+          | "font" -> { acc with font = add k acc.font v }
+          | "font-weight" -> { acc with font_weight = add k acc.font_weight v }
           | "inset-shadow" ->
-            { acc with inset_shadow = add key acc.inset_shadow values }
-          | "leading" -> { acc with leading = add key acc.leading values }
-          | "perspective" ->
-            { acc with perspective = add key acc.perspective values }
-          | "radius" -> { acc with radius = add key acc.radius values }
-          | "shadow" -> { acc with shadow = add key acc.shadow values }
-          | "spacing" -> { acc with spacing = add key acc.spacing values }
+            { acc with inset_shadow = add k acc.inset_shadow v }
+          | "leading" -> { acc with leading = add k acc.leading v }
+          | "perspective" -> { acc with perspective = add k acc.perspective v }
+          | "radius" -> { acc with radius = add k acc.radius v }
+          | "shadow" -> { acc with shadow = add k acc.shadow v }
+          | "spacing" ->
+            { acc with spacing = parse_spacing (Yojson.Basic.Util.to_string v) }
           | "text-line-height" ->
-            { acc with text_line_height = add key acc.text_line_height values }
-          | "text-size" -> { acc with text_size = add key acc.text_size values }
-          | "tracking" -> { acc with tracking = add key acc.tracking values }
-          | _ -> raise (Invalid_argument ("invalid theme option: " ^ key)))
+            { acc with text_line_height = add k acc.text_line_height v }
+          | "text-size" -> { acc with text_size = add k acc.text_size v }
+          | "tracking" -> { acc with tracking = add k acc.tracking v }
+          | _ -> raise (Invalid_argument ("invalid theme option: " ^ k)))
         empty items
       |> Result.ok
     with exn -> Error exn)

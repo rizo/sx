@@ -220,6 +220,39 @@
   $ sx <<< 'stroke-2'
   .stroke-2 { stroke-width: 2; }
 
+indent
+  $ sx <<< 'indent-0 indent-px indent-1 indent-3.5 indent-96'
+  .indent-0 { text-indent: 0px; }
+  .indent-1 { text-indent: 0.25rem; }
+  .indent-3.5 { text-indent: 0.875rem; }
+  .indent-96 { text-indent: 24rem; }
+  .indent-px { text-indent: 1px; }
+
+text
+  $ sx <<< 'text-sm text-base text-9xl'
+  .text-9xl { font-size: 8rem; line-height: 1; }
+  .text-base { font-size: 1rem; line-height: calc(1.5 / 1); }
+  .text-sm { font-size: 0.875rem; line-height: calc(1.25 / 0.875); }
+
+top-right-bottom-left
+  $ sx <<< 'inset-0 left-96 inset-64 inset-y-72 right-56 bottom-3 end-4 start-7 top-5 right-0 inset-x-px bottom-0.5 inset-x-auto end-2/3 top-3/4 start-full'
+  .bottom-0.5 { bottom: 0.125rem; }
+  .bottom-3 { bottom: 0.75rem; }
+  .end-4 { inset-inline-end: 1rem; }
+  .inset-0 { inset: 0px; }
+  .inset-64 { inset: 16rem; }
+  .inset-x-auto TODO
+  .inset-x-px { left: 1px;right: 1px; }
+  .inset-y-72 { top: 18rem;bottom: 18rem; }
+  .left-96 { left: 24rem; }
+  .right-0 { right: 0px; }
+  .right-56 { right: 14rem; }
+  .start-7 { inset-inline-start: 1.75rem; }
+  .start-full TODO
+  .top-5 { top: 1.25rem; }
+  .end-2/3 TODO
+  .top-3/4 TODO
+
   $ sx <<< 'md:border-t'
   @media (min-width: 768px) {
     .md\:border-t { border-top-width: 1px; }

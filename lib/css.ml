@@ -45,8 +45,8 @@ let pp_scope formatter =
 
 let pp formatter self =
   let pp_media size =
-    Format.fprintf formatter "@[<v>@[<v2>@@media (min-width: %dpx) {@,%a@]@,}@]"
-      size pp_scope
+    Format.fprintf formatter
+      "@[<v>@[<v2>@@media (min-width: %dpx) {@,%a@]@,}@]@," size pp_scope
   in
   if not (String_map.is_empty self.global) then
     Format.fprintf formatter "%a@." pp_scope self.global;

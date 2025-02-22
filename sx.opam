@@ -7,4 +7,5 @@ depends: [
   "fmt"
   "yojson" # config
   "lambdasoup" {with-test}
+  "css" {with-test}
 ]
