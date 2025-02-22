@@ -238,20 +238,20 @@ top-right-bottom-left
   $ sx <<< 'inset-0 left-96 inset-64 inset-y-72 right-56 bottom-3 end-4 start-7 top-5 right-0 inset-x-px bottom-0.5 inset-x-auto end-2/3 top-3/4 start-full'
   .bottom-0.5 { bottom: 0.125rem; }
   .bottom-3 { bottom: 0.75rem; }
+  .end-2/3 { inset-inline-end: 66.6666666667%; }
   .end-4 { inset-inline-end: 1rem; }
   .inset-0 { inset: 0px; }
   .inset-64 { inset: 16rem; }
-  .inset-x-auto TODO
+  .inset-x-auto { left: auto;right: auto; }
   .inset-x-px { left: 1px;right: 1px; }
   .inset-y-72 { top: 18rem;bottom: 18rem; }
   .left-96 { left: 24rem; }
   .right-0 { right: 0px; }
   .right-56 { right: 14rem; }
   .start-7 { inset-inline-start: 1.75rem; }
-  .start-full TODO
+  .start-full { inset-inline-start: 100%; }
+  .top-3/4 { top: 75%; }
   .top-5 { top: 1.25rem; }
-  .end-2/3 TODO
-  .top-3/4 TODO
 
   $ sx <<< 'md:border-t'
   @media (min-width: 768px) {

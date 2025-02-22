@@ -33,6 +33,16 @@ let len (spacing, unit) len_input =
     in
     Either.Left [ m_str ^ unit ]
 
+let frac n_c m_c =
+  let n = float (Char.code n_c - 48) in
+  let m = float (Char.code m_c - 48) in
+  let pct = n /. m *. 100. in
+  let pct_str =
+    if Float.is_integer pct then string_of_int (Float.to_int pct)
+    else string_of_float pct
+  in
+  Either.Left [ pct_str ^ "%" ]
+
 let text (theme : Theme.t) key =
   try
     let size = String_map.find key theme.text_size in

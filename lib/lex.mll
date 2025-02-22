@@ -34,6 +34,8 @@ let pseudo_class_variant =
 
 let side = ['x' 'y' 's' 'e' 't' 'r' 'b' 'l']
 
+let digit = ['0'-'9']
+
 let len_int =
     ['0'-'9']
   | "10"
@@ -209,7 +211,42 @@ rule read_utility state theme = parse
     ["position: "; v; ";"]
   }
 
-  (* top-right-bottom-left *)
+  (* top-right-bottom-left pcp *)
+  | "left-" (digit as n) "/" (digit as m) {
+    let* len = Gen.frac n m in
+    ["left: "; len; ";"]
+  }
+  | "right-" (digit as n) "/" (digit as m) {
+    let* len = Gen.frac n m in
+    ["right: "; len; ";"]
+  }
+  | "bottom-" (digit as n) "/" (digit as m) {
+    let* len = Gen.frac n m in
+    ["bottom: "; len; ";"]
+  }
+  | "top-" (digit as n) "/" (digit as m) {
+    let* len = Gen.frac n m in
+    ["top: "; len; ";"]
+  }
+  | "inset-" (digit as n) "/" (digit as m) {
+    let* len = Gen.frac n m in
+    ["inset: "; len; ";"]
+  }
+  | "inset-" (side as side) "-" (digit as n) "/" (digit as m) {
+    let* side = Gen.side (String.make 1 side) in
+    let* len = Gen.frac n m in
+    [side; ": "; len; ";"]
+  }
+  | "start-" (digit as n) "/" (digit as m) {
+    let* len = Gen.frac n m in
+    ["inset-inline-start: "; len; ";"]
+  }
+  | "end-" (digit as n) "/" (digit as m) {
+    let* len = Gen.frac n m in
+    ["inset-inline-end: "; len; ";"]
+  }
+
+  (* top-right-bottom-left len *)
   | "left-" ((len | auto | full) as len) {
     let* len = Gen.len theme.spacing len in
     ["left: "; len; ";"]
