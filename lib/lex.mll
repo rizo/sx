@@ -34,7 +34,7 @@ let pseudo_class_variant =
 
 let side = ['x' 'y' 's' 'e' 't' 'r' 'b' 'l']
 
-let digit = ['0'-'9']
+let num = ['1'-'9']['0'-'9']*
 
 let len_int =
     ['0'-'9']
@@ -122,6 +122,30 @@ let border_style =
   | "double"
   | "hidden"
   | "none"
+
+let width =
+    len
+  | auto
+  | full
+  | "screen"
+  | "svw"
+  | "lvw"
+  | "dvw"
+  | "min"
+  | "max"
+  | "fit"
+
+let height =
+    len
+  | auto
+  | full
+  | "screen"
+  | "svh"
+  | "lvh"
+  | "dvh"
+  | "min"
+  | "max"
+  | "fit"
 
 (* Chars that delimit utility names.
   If a utility name is not delimited by one of these, it will NOT be treated as
@@ -211,37 +235,37 @@ rule read_utility state theme = parse
     ["position: "; v; ";"]
   }
 
-  (* top-right-bottom-left pcp *)
-  | "left-" (digit as n) "/" (digit as m) {
+  (* top-right-bottom-left frac *)
+  | "left-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
     ["left: "; len; ";"]
   }
-  | "right-" (digit as n) "/" (digit as m) {
+  | "right-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
     ["right: "; len; ";"]
   }
-  | "bottom-" (digit as n) "/" (digit as m) {
+  | "bottom-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
     ["bottom: "; len; ";"]
   }
-  | "top-" (digit as n) "/" (digit as m) {
+  | "top-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
     ["top: "; len; ";"]
   }
-  | "inset-" (digit as n) "/" (digit as m) {
+  | "inset-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
     ["inset: "; len; ";"]
   }
-  | "inset-" (side as side) "-" (digit as n) "/" (digit as m) {
+  | "inset-" (side as side) "-" (num as n) "/" (num as m) {
     let* side = Gen.side (String.make 1 side) in
     let* len = Gen.frac n m in
     [side; ": "; len; ";"]
   }
-  | "start-" (digit as n) "/" (digit as m) {
+  | "start-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
     ["inset-inline-start: "; len; ";"]
   }
-  | "end-" (digit as n) "/" (digit as m) {
+  | "end-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
     ["inset-inline-end: "; len; ";"]
   }
@@ -279,6 +303,43 @@ rule read_utility state theme = parse
   | "end-" ((len | auto | full) as len) {
     let* len = Gen.len theme.spacing len in
     ["inset-inline-end: "; len; ";"]
+  }
+
+  (* gap *)
+  | "gap-" (len as len) {
+    let* len = Gen.len theme.spacing len in
+    ["gap: "; len; ";"]
+  }
+
+  (* gap *)
+  | "gap-" (side as side) "-" (len as len) {
+    let* dir = Gen.dir (String.make 1 side) in
+    let* len = Gen.len theme.spacing len in
+    [dir; "-gap: "; len; ";"]
+  }
+
+  (* width frac *)
+  | "w-" (num as n) "/" (num as m) {
+    let* pct = Gen.frac n m in
+    ["width: "; pct; ";"]
+  }
+
+  (* width *)
+  | "w-" (width as key) {
+    let* len = (Gen.len theme.spacing or Gen.width) key in
+    ["width: "; len; ";"]
+  }
+
+  (* height frac *)
+  | "h-" (num as n) "/" (num as m) {
+    let* pct = Gen.frac n m in
+    ["height: "; pct; ";"]
+  }
+
+  (* height *)
+  | "h-" (height as key) {
+    let* len = (Gen.len theme.spacing or Gen.height) key in
+    ["height: "; len; ";"]
   }
 
   (* margin *)

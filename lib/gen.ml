@@ -16,16 +16,22 @@ let side x =
   | "l" -> Either.Left [ "left" ]
   | _ -> invalid_arg ("invalid side: " ^ x)
 
+let dir x =
+  match x with
+  | "x" -> Either.Left [ "column" ]
+  | "y" -> Either.Left [ "row" ]
+  | _ -> invalid_arg ("invalid dir: " ^ x)
+
 let px x = Either.Left [ x ^ "px" ]
 
-let len (spacing, unit) len_input =
-  match len_input with
+let len (spacing, unit) key =
+  match key with
   | "0" -> Either.Left [ "0px" ]
   | "px" -> Either.Left [ "1px" ]
   | "auto" -> Either.Left [ "auto" ]
   | "full" -> Either.Left [ "100%" ]
   | n_str ->
-    let n = float_of_string n_str in
+    let n = try float_of_string n_str with _ -> unknown_key key in
     let m = spacing *. n in
     let m_str =
       if Float.is_integer m then string_of_int (Float.to_int m)
@@ -33,9 +39,31 @@ let len (spacing, unit) len_input =
     in
     Either.Left [ m_str ^ unit ]
 
+let width key =
+  match key with
+  | "screen" -> Either.Left [ "100vw" ]
+  | "svw" -> Either.Left [ "100svw" ]
+  | "lvw" -> Either.Left [ "100lvw" ]
+  | "dvw" -> Either.Left [ "100dvw" ]
+  | "min" -> Either.Left [ "min-content" ]
+  | "max" -> Either.Left [ "max-content" ]
+  | "fit" -> Either.Left [ "fit-content" ]
+  | _ -> unknown_key key
+
+let height key =
+  match key with
+  | "screen" -> Either.Left [ "100vh" ]
+  | "svh" -> Either.Left [ "100svh" ]
+  | "lvh" -> Either.Left [ "100lvh" ]
+  | "dvh" -> Either.Left [ "100dvh" ]
+  | "min" -> Either.Left [ "min-content" ]
+  | "max" -> Either.Left [ "max-content" ]
+  | "fit" -> Either.Left [ "fit-content" ]
+  | _ -> unknown_key key
+
 let frac n_c m_c =
-  let n = float (Char.code n_c - 48) in
-  let m = float (Char.code m_c - 48) in
+  let n = float (int_of_string n_c) in
+  let m = float (int_of_string m_c) in
   let pct = n /. m *. 100. in
   let pct_str =
     if Float.is_integer pct then string_of_int (Float.to_int pct)

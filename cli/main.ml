@@ -1,4 +1,5 @@
 let () =
+  Printexc.record_backtrace true;
   let chan =
     match Sys.argv with
     | [| _; "-" |] | [| _ |] -> stdin
