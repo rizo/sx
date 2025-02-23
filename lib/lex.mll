@@ -353,6 +353,18 @@ rule read_utility state theme = parse
     ["margin-"; side; ": "; minus; len; ";"]
   }
 
+  (* z *)
+  | "z-" ("0" | "10" | "20" | "30" | "40" | "50" | auto as key) {
+    ["z-index: "; key; ";"]
+  }
+
+  (* basis *)
+  | "basis-" (num as n) "/" (num as m) {
+    let* pct = Gen.frac n m in
+    ["flex-basis: "; pct; ";"]
+  }
+  | "basis-full" { ["flex-basis: 100%;"] }
+
   (* padding *)
   | "p-" (len as len) {
     let* len = Gen.len theme.spacing len in

@@ -314,6 +314,22 @@ height extra
   .h-screen { height: 100vh; }
   .h-svh { height: 100svh; }
 
+z
+  $ sx <<< 'z-0 z-10 z-20 z-30 z-40 z-50 z-auto'
+  .z-0 { z-index: 0; }
+  .z-10 { z-index: 10; }
+  .z-20 { z-index: 20; }
+  .z-30 { z-index: 30; }
+  .z-40 { z-index: 40; }
+  .z-50 { z-index: 50; }
+  .z-auto { z-index: auto; }
+
+basis
+  $ sx <<< 'basis-1/2 basis-8/12 basis-full'
+  .basis-1/2 { flex-basis: 50%; }
+  .basis-8/12 { flex-basis: 66.6666666667%; }
+  .basis-full { flex-basis: 100%; }
+
   $ sx <<< 'md:border-t'
   @media (min-width: 768px) {
     .md\:border-t { border-top-width: 1px; }
