@@ -346,6 +346,67 @@ backdrop-opacity
   .backdrop-opacity-5 { backdrop-filter: opacity(0.05); }
   .backdrop-opacity-80 { backdrop-filter: opacity(0.8); }
 
+justify-content
+  $ sx <<< 'justify-normal justify-start justify-end justify-center justify-between justify-around justify-evenly justify-stretch'
+  .justify-around { justify-content: space-around; }
+  .justify-between { justify-content: space-between; }
+  .justify-center { justify-content: center; }
+  .justify-end { justify-content: flex-end; }
+  .justify-evenly { justify-content: space-evenly; }
+  .justify-normal { justify-content: normal; }
+  .justify-start { justify-content: flex-start; }
+  .justify-stretch { justify-content: stretch; }
+
+align-content
+  $ sx <<< 'content-around content-baseline content-between content-center content-end content-evenly content-normal content-start content-stretch'
+  .content-around { align-content: space-around; }
+  .content-baseline { align-content: baseline; }
+  .content-between { align-content: space-between; }
+  .content-center { align-content: center; }
+  .content-end { align-content: flex-end; }
+  .content-evenly { align-content: space-evenly; }
+  .content-normal { align-content: normal; }
+  .content-start { align-content: flex-start; }
+  .content-stretch { align-content: stretch; }
+
+justify-items
+  $ sx <<< 'justify-items-start justify-items-end justify-items-center justify-items-stretch'
+  .justify-items-center { justify-items: center; }
+  .justify-items-end { justify-items: end; }
+  .justify-items-start { justify-items: start; }
+  .justify-items-stretch { justify-items: stretch; }
+
+justify-self
+  $ sx <<< 'justify-self-start justify-self-center'
+  .justify-self-center { justify-self: center; }
+  .justify-self-start { justify-self: start; }
+
+align-items
+  $ sx <<< 'items-start items-baseline'
+  .items-baseline { align-items: baseline; }
+  .items-start { align-items: flex-start; }
+
+align-self
+  $ sx <<< 'self-auto self-end self-baseline'
+  .self-auto { align-self: auto; }
+  .self-baseline { align-self: baseline; }
+  .self-end { align-self: flex-end; }
+
+place-content
+  $ sx <<< 'place-content-start place-content-stretch'
+  .place-content-start { place-content: flex-start; }
+  .place-content-stretch { place-content: stretch; }
+
+place-items
+  $ sx <<< 'place-items-end place-items-baseline'
+  .place-items-baseline { place-items: baseline; }
+  .place-items-end { place-items: flex-end; }
+
+place-self
+  $ sx <<< 'place-self-auto place-self-center'
+  .place-self-auto { place-self: auto; }
+  .place-self-center { place-self: center; }
+
   $ sx <<< 'md:border-t'
   @media (min-width: 768px) {
     .md\:border-t { border-top-width: 1px; }

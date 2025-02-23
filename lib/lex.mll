@@ -149,6 +149,16 @@ let height =
   | "max"
   | "fit"
 
+let content =
+    "normal"
+  | "start"
+  | "end"
+  | "center"
+  | "between"
+  | "around"
+  | "evenly"
+  | "stretch"
+
 (* Chars that delimit utility names.
   If a utility name is not delimited by one of these, it will NOT be treated as
   a valid utility. EOF is treated as a delimiter in the lexer.
@@ -377,6 +387,59 @@ rule read_utility state theme = parse
   | "backdrop-opacity-" (pct as key) {
     let* pct = Gen.pct key in
     ["backdrop-filter: opacity("; pct;");"]
+  }
+
+  (* justify-content *)
+  | "justify-" (content as k) {
+    let* v = Gen.content k in
+    ["justify-content: "; v; ";"]
+  }
+
+  (* justify-items *)
+  | "justify-items-" (("start" | "end" | "center" | "stretch") as v) {
+    ["justify-items: "; v; ";"]
+  }
+
+  (* justify-self *)
+  | "justify-self-" ((auto | "start" | "end" | "center" | "stretch") as v) {
+    ["justify-self: "; v; ";"]
+  }
+
+  (* align-content *)
+  | "content-" ((content | "baseline") as k) {
+    let* v = Gen.content k in
+    ["align-content: "; v; ";"]
+  }
+
+  (* align-items *)
+  | "items-" (("start" | "end" | "center" | "baseline" | "stretch") as k) {
+    let* v = Gen.content k in
+    ["align-items: "; v; ";"]
+  }
+
+  (* align-self *)
+  | "self-" ((auto | "start" | "end" | "center" | "baseline" | "stretch") as k) {
+    let* v = Gen.content k in
+    ["align-self: "; v; ";"]
+  }
+
+  (* place-content *)
+  | "place-content-" (("start" | "end" | "center" | "between" 
+                      | "arount" | "evenly" | "baseline" | "stretch") as k) {
+    let* v = Gen.content k in
+    ["place-content: "; v; ";"]
+  }
+
+  (* place-items *)
+  | "place-items-" (("start" | "end" | "center" | "baseline" | "stretch") as k) {
+    let* v = Gen.content k in
+    ["place-items: "; v; ";"]
+  }
+
+  (* place-self *)
+  | "place-self-" ((auto | "start" | "end" | "center"  | "stretch") as k) {
+    let* v = Gen.content k in
+    ["place-self: "; v; ";"]
   }
 
   (* padding *)

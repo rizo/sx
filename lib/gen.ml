@@ -70,6 +70,20 @@ let pct key =
   in
   Either.Left [ pct_str ]
 
+let content key =
+  match key with
+  | "auto" -> Either.Left [ "auto" ]
+  | "normal" -> Either.Left [ "normal" ]
+  | "start" -> Either.Left [ "flex-start" ]
+  | "end" -> Either.Left [ "flex-end" ]
+  | "center" -> Either.Left [ "center" ]
+  | "between" -> Either.Left [ "space-between" ]
+  | "around" -> Either.Left [ "space-around" ]
+  | "evenly" -> Either.Left [ "space-evenly" ]
+  | "stretch" -> Either.Left [ "stretch" ]
+  | "baseline" -> Either.Left [ "baseline" ]
+  | _ -> unknown_key key
+
 let frac n_c m_c =
   let n = float (int_of_string n_c) in
   let m = float (int_of_string m_c) in
