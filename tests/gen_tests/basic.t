@@ -330,6 +330,22 @@ basis
   .basis-8/12 { flex-basis: 66.6666666667%; }
   .basis-full { flex-basis: 100%; }
 
+opacity
+  $ sx <<< 'opacity-0 opacity-5 opacity-10 opacity-80 opacity-100'
+  .opacity-0 { opacity: 0; }
+  .opacity-10 { opacity: 0.1; }
+  .opacity-100 { opacity: 1; }
+  .opacity-5 { opacity: 0.05; }
+  .opacity-80 { opacity: 0.8; }
+
+backdrop-opacity
+  $ sx <<< 'backdrop-opacity-0 backdrop-opacity-5 backdrop-opacity-10 backdrop-opacity-80 backdrop-opacity-100'
+  .backdrop-opacity-0 { backdrop-filter: opacity(0); }
+  .backdrop-opacity-10 { backdrop-filter: opacity(0.1); }
+  .backdrop-opacity-100 { backdrop-filter: opacity(1); }
+  .backdrop-opacity-5 { backdrop-filter: opacity(0.05); }
+  .backdrop-opacity-80 { backdrop-filter: opacity(0.8); }
+
   $ sx <<< 'md:border-t'
   @media (min-width: 768px) {
     .md\:border-t { border-top-width: 1px; }

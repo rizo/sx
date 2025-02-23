@@ -61,6 +61,15 @@ let height key =
   | "fit" -> Either.Left [ "fit-content" ]
   | _ -> unknown_key key
 
+let pct key =
+  let n = int_of_string key in
+  let pct = float n /. 100.0 in
+  let pct_str =
+    if Float.is_integer pct then string_of_int (Float.to_int pct)
+    else string_of_float pct
+  in
+  Either.Left [ pct_str ]
+
 let frac n_c m_c =
   let n = float (int_of_string n_c) in
   let m = float (int_of_string m_c) in

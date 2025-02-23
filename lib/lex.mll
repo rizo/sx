@@ -36,6 +36,8 @@ let side = ['x' 'y' 's' 'e' 't' 'r' 'b' 'l']
 
 let num = ['1'-'9']['0'-'9']*
 
+let pct = "0" | "5" | "100" | (['1'-'9'] ("0" | "5"))
+
 let len_int =
     ['0'-'9']
   | "10"
@@ -364,6 +366,18 @@ rule read_utility state theme = parse
     ["flex-basis: "; pct; ";"]
   }
   | "basis-full" { ["flex-basis: 100%;"] }
+
+  (* opacity *)
+  | "opacity-" (pct as key) {
+    let* pct = Gen.pct key in
+    ["opacity: "; pct; ";"]
+  }
+
+  (* backdrop-opacity *)
+  | "backdrop-opacity-" (pct as key) {
+    let* pct = Gen.pct key in
+    ["backdrop-filter: opacity("; pct;");"]
+  }
 
   (* padding *)
   | "p-" (len as len) {
