@@ -1,3 +1,9 @@
 (executable
-  (name tw_get_rules)
-  (libraries lambdasoup unix))
+ (name tw_get_rules)
+ (modules Tw_get_rules)
+ (libraries lambdasoup unix))
+
+(executable
+ (name css_fmt)
+ (modules Css_fmt)
+ (libraries css))
