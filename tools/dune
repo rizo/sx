@@ -7,3 +7,8 @@
  (name css_fmt)
  (modules Css_fmt)
  (libraries css))
+
+(executable
+ (name sx_linewise)
+ (modules Sx_linewise)
+ (libraries sx fmt))

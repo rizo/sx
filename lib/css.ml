@@ -39,14 +39,13 @@ let add ~scope ~selector ~properties self =
 
 let pp_scope formatter =
   let pp_binding formatter (key, rules) =
-    Format.fprintf formatter ".%s { %a }" key Format.pp_print_string rules
+    Format.fprintf formatter ".%s{%a}" key Format.pp_print_string rules
   in
-  Fmt.pf formatter "@[<v>%a@]" (Fmt.iter_bindings String_map.iter pp_binding)
+  Fmt.pf formatter "%a" (Fmt.iter_bindings String_map.iter pp_binding)
 
 let pp formatter self =
   let pp_media size =
-    Format.fprintf formatter
-      "@[<v>@[<v2>@@media (min-width: %dpx) {@,%a@]@,}@]@," size pp_scope
+    Format.fprintf formatter "@media (width>=%dpx){%a}@." size pp_scope
   in
   if not (String_map.is_empty self.global) then
     Format.fprintf formatter "%a@." pp_scope self.global;
@@ -77,7 +76,8 @@ let string_of_scope scope =
   | `xl -> "xl"
   | `xl2 -> "2xl"
 
-let chars_that_need_escaping = Char_set.of_list [ ':'; '['; ']'; '('; ')'; '&' ]
+let chars_that_need_escaping =
+  Char_set.of_list [ ':'; '['; ']'; '('; ')'; '&'; '.'; '/' ]
 
 let make_selector_name ~scope ~variants ~utility =
   let utility =

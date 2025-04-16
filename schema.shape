@@ -1,0 +1,77 @@
+
+aspect = {
+  "aspect-" (a = theme.aspect) => {
+    "aspect-ratio": a
+  }
+};
+
+columns = {
+  "columns-" (c = ['0'-'9'] | ('1' ('0' | '1' | '2') | "auto")) => {
+    "columns": c
+  },
+  "columns-" (s = size) => {
+    "columns": s
+  }
+};
+
+bg = {
+  "bg-" (c = color) => {
+    "background-color" = c
+  }
+};
+
+margin = {
+  (neg = "-"?) "m-" (s = theme.side) "-" (l = theme.len) => {
+    "margin-" s = neg l
+  },
+  (neg = "-"?) "m-" (l = len) => {
+    "margin" = neg l
+  }
+};
+
+text = {
+  "text-" (t = text_size) => {
+    "font-size" = t.size,
+    "line-height" = t.line_height
+  }
+};
+
+width = {
+  "w-" (v = custom) => {
+    "width" = v
+  },
+  "w-" (n = int) "/" (m = int) => {
+    "width" = frac n m
+  }
+};
+
+clear = {
+  "clear-" (c = "start" | "end") => {
+    "clear" = "inline-" + c
+  },
+  "clear-" (c = "left" | "right" | "none") => {
+    "clear" = c
+  }
+};
+
+button = {
+  "btn" => {
+    "border" = "1px solid red",
+    "background" = "blue"
+  },
+
+  "btn" => {
+    "border",
+    "bg-" + btn.primary
+  }
+};
+
+shadow = {
+  "shadow-" (c = color) => {
+    "--sx-shadow-color" = c
+  },
+  "shadow-" (s = size) => {
+    "box-shadow" = s
+  }
+};
+

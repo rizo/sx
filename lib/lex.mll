@@ -1,6 +1,7 @@
 {
   let ( let* ) = Gen.( let* )
   let (or) = Gen.(or)
+  let concat = String.concat ""
 
   exception Non_utility
 
@@ -169,218 +170,298 @@ let delim = ' ' | '\n' | '\t' | '\"' | '\'' | '|'
 
 rule read_utility state theme = parse
   (* aspect-ratio *)
-  | "aspect-auto" { ["aspect-ratio:auto;"] }
-  | "aspect-square" { ["aspect-ratio:1 / 1;"] }
-  | "aspect-video" { ["aspect-ratio:16 / 9;"] }
+  | "aspect-auto" {
+    [Gen.decl "aspect-ratio" "auto"]
+  }
+  | "aspect-square" {
+    [Gen.decl "aspect-ratio" "1/1"]
+  }
+  | "aspect-video" {
+    [Gen.decl "aspect-ratio" "16/9"]
+  }
 
   (* columns *)
   | "columns-" (['0'-'9'] | ('1' ('0' | '1' | '2') | auto) as v) {
-    ["columns: "; v; ";" ]
+    [Gen.decl "columns" v]
   }
   | "columns-" (size as size) {
     let* size = Gen.get theme.size size in
-    ["columns: "; size; ";"]
+    [Gen.decl "columns" size]
   }
 
   (* break *)
-  | "break-after-" (break_value as v) { ["break-after: "; v; ";"] }
-  | "break-before-" (break_value as v) { ["break-before: "; v; ";"] }
-  | "break-inside-" (break_inside_value as v) { ["break-before: "; v; ";"] }
+  | "break-after-" (break_value as v) {
+    [Gen.decl "break-after" v]
+  }
+  | "break-before-" (break_value as v) {
+    [Gen.decl "break-before" v]
+  }
+  | "break-inside-" (break_inside_value as v) {
+    [Gen.decl "break-before" v]
+  }
 
   (* box-decoration *)
-  | "box-decoration-" ("clone" | "slice" as v) { ["box-decoration-break: "; v; ";"] }
+  | "box-decoration-" ("clone" | "slice" as v) {
+    [Gen.decl "box-decoration-break" v]
+  }
 
   (* box-sizing *)
-  | "box-" ("border" | "content" as v) { ["box-sizing: "; v; "-box;"] }
+  | "box-" ("border" | "content" as v) {
+    [Gen.decl "box-sizing" (v ^ "-box")]
+  }
 
   (* display *)
-  | "block" as v { ["display: "; v; ";"] }
-  | "inline-block" as v { ["display: "; v;  ";"] }
-  | "inline" as v { ["display: "; v; ";"] }
-  | "flex" as v { ["display: "; v; ";"] }
-  | "inline-flex" as v { ["display: "; v; ";"] }
-  | "table" as v { ["display: "; v; ";"] }
-  | "inline-table" as v { ["display: "; v; ";"] }
-  | "table-caption" as v { ["display: "; v; ";"] }
-  | "table-cell" as v { ["display: "; v; ";"] }
-  | "table-column" as v { ["display: "; v; ";"] }
-  | "table-column-group" as v { ["display: "; v; ";"] }
-  | "table-footer-group" as v { ["display: "; v; ";"] }
-  | "table-header-group" as v { ["display: "; v; ";"] }
-  | "table-row-group" as v { ["display: "; v; ";"] }
-  | "table-row" as v { ["display: "; v; ";"] }
-  | "flow-root" as v { ["display: "; v; ";"] }
-  | "grid" as v { ["display: "; v; ";"] }
-  | "inline-grid" as v { ["display: "; v; ";"] }
-  | "contents" as v { ["display: "; v; ";"] }
-  | "list-item" as v { ["display: "; v ; ";"] }
-  | "hidden" { ["display:none;"] }
+  | "block" as v {
+    [Gen.decl "display" v]
+  }
+  | "inline-block" as v {
+    [Gen.decl "display" v]
+  }
+  | "inline" as v {
+    [Gen.decl "display" v]
+  }
+  | "flex" as v {
+    [Gen.decl "display" v]
+  }
+  | "inline-flex" as v {
+    [Gen.decl "display" v]
+  }
+  | "table" as v {
+    [Gen.decl "display" v]
+  }
+  | "inline-table" as v {
+    [Gen.decl "display" v]
+  }
+  | "table-caption" as v {
+    [Gen.decl "display" v]
+  }
+  | "table-cell" as v {
+    [Gen.decl "display" v]
+  }
+  | "table-column" as v {
+    [Gen.decl "display" v]
+  }
+  | "table-column-group" as v {
+    [Gen.decl "display" v]
+  }
+  | "table-footer-group" as v {
+    [Gen.decl "display" v]
+  }
+  | "table-header-group" as v {
+    [Gen.decl "display" v]
+  }
+  | "table-row-group" as v {
+    [Gen.decl "display" v]
+  }
+  | "table-row" as v {
+    [Gen.decl "display" v]
+  }
+  | "flow-root" as v {
+    [Gen.decl "display" v]
+  }
+  | "grid" as v {
+    [Gen.decl "display" v]
+  }
+  | "inline-grid" as v {
+    [Gen.decl "display" v]
+  }
+  | "contents" as v {
+    [Gen.decl "display" v]
+  }
+  | "list-item" as v {
+    [Gen.decl "display" v ]
+  }
+  | "hidden" {
+    [Gen.decl "display" "none"]
+  }
 
   (* flex-basis *)
-  | "basis-auto" { ["flex-basis:auto;"] }
+  | "basis-auto" {
+    [Gen.decl "flex-basis" "auto"]
+  }
   | "basis-" (len as len) {
     let* len = Gen.len theme.spacing len in
-    ["flex-basis: "; len; ";"]
+    [Gen.decl "flex-basis" len]
   }
 
   (* float *)
-  | "float-start" { ["float:inline-start;"] }
-  | "float-end" { ["float:inline-end;"] }
-  | "float-" ("left" | "right" | "none" as v) { ["float: "; v; ";"] }
+  | "float-start" {
+    [Gen.decl "float" "inline-start"]
+  }
+  | "float-end" {
+    [Gen.decl "float" "inline-end"]
+  }
+  | "float-" ("left" | "right" | "none" as v) {
+    [Gen.decl "float" v]
+  }
 
   (* clear *)
-  | "clear-start" { ["clear:inline-start;"] }
-  | "clear-end" { ["clear:inline-end;"] }
-  | "clear-" ("left" | "right" | "none" as v) { ["clear: "; v; ";"] }
+  | "clear-start" {
+    [Gen.decl "clear" "inline-start"]
+  }
+  | "clear-end" {
+    [Gen.decl "clear" "inline-end"]
+  }
+  | "clear-" ("left" | "right" | "none" as v) {
+    [Gen.decl "clear" v]
+  }
 
   (* isolate *)
-  | "isolate" { ["isolation:isolate;"] }
-  | "isolation-auto" { ["isolation:auto;"] }
+  | "isolate" {
+    [Gen.decl "isolation" "isolate"]
+  }
+  | "isolation-auto" {
+    [Gen.decl "isolation" "auto"]
+  }
 
   (* object-fit *)
   | "object-" ("contain" | "cover" | "fill" | "none" | "scale-down" as v) {
-    ["object-fit: "; v; ";"]
+    [Gen.decl "object-fit" v]
   }
 
   (* position *)
   | "static" | "fixed" | "absolute" | "relative" | "sticky" as v {
-    ["position: "; v; ";"]
+    [Gen.decl "position" v]
   }
 
   (* top-right-bottom-left frac *)
   | "left-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
-    ["left: "; len; ";"]
+    [Gen.decl "left" len]
   }
   | "right-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
-    ["right: "; len; ";"]
+    [Gen.decl "right" len]
   }
   | "bottom-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
-    ["bottom: "; len; ";"]
+    [Gen.decl "bottom" len]
   }
   | "top-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
-    ["top: "; len; ";"]
+    [Gen.decl "top" len]
   }
   | "inset-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
-    ["inset: "; len; ";"]
+    [Gen.decl "inset" len]
   }
   | "inset-" (side as side) "-" (num as n) "/" (num as m) {
     let* side = Gen.side (String.make 1 side) in
     let* len = Gen.frac n m in
-    [side; ": "; len; ";"]
+    [Gen.decl side len]
   }
   | "start-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
-    ["inset-inline-start: "; len; ";"]
+    [Gen.decl "inset-inline-start" len]
   }
   | "end-" (num as n) "/" (num as m) {
     let* len = Gen.frac n m in
-    ["inset-inline-end: "; len; ";"]
+    [Gen.decl "inset-inline-end" len]
   }
 
   (* top-right-bottom-left len *)
   | "left-" ((len | auto | full) as len) {
     let* len = Gen.len theme.spacing len in
-    ["left: "; len; ";"]
+    [Gen.decl "left" len]
   }
   | "right-" ((len | auto | full) as len) {
     let* len = Gen.len theme.spacing len in
-    ["right: "; len; ";"]
+    [Gen.decl "right" len]
   }
   | "bottom-" ((len | auto | full) as len) {
     let* len = Gen.len theme.spacing len in
-    ["bottom: "; len; ";"]
+    [Gen.decl "bottom" len]
   }
   | "top-" ((len | auto | full) as len) {
     let* len = Gen.len theme.spacing len in
-    ["top: "; len; ";"]
+    [Gen.decl "top" len]
   }
   | "inset-" ((len | auto | full) as len) {
     let* len = Gen.len theme.spacing len in
-    ["inset: "; len; ";"]
+    [Gen.decl "inset" len]
   }
   | "inset-" (side as side) "-" ((len | auto | full) as len) {
     let* side = Gen.side (String.make 1 side) in
     let* len = Gen.len theme.spacing len in
-    [side; ": "; len; ";"]
+    [Gen.decl side len]
   }
   | "start-" ((len | auto | full) as len) {
     let* len = Gen.len theme.spacing len in
-    ["inset-inline-start: "; len; ";"]
+    [Gen.decl "inset-inline-start" len]
   }
   | "end-" ((len | auto | full) as len) {
     let* len = Gen.len theme.spacing len in
-    ["inset-inline-end: "; len; ";"]
+    [Gen.decl "inset-inline-end" len]
   }
 
   (* gap *)
   | "gap-" (len as len) {
     let* len = Gen.len theme.spacing len in
-    ["gap: "; len; ";"]
+    [Gen.decl "gap" len]
   }
 
   (* gap *)
   | "gap-" (side as side) "-" (len as len) {
     let* dir = Gen.dir (String.make 1 side) in
     let* len = Gen.len theme.spacing len in
-    [dir; "-gap: "; len; ";"]
-  }
-
-  (* width frac *)
-  | "w-" (num as n) "/" (num as m) {
-    let* pct = Gen.frac n m in
-    ["width: "; pct; ";"]
+    [Gen.decl (dir ^ "-gap") len]
   }
 
   (* width *)
+  | "w-[" ([^ '[' ']' '{' '}' '@']+ as v) "]" {
+    [Gen.decl "width" v]
+  }
+  | "w-" (num as n) "/" (num as m) {
+    let* pct = Gen.frac n m in
+    [Gen.decl "width" pct]
+  }
   | "w-" (width as key) {
     let* len = (Gen.len theme.spacing or Gen.width) key in
-    ["width: "; len; ";"]
-  }
-
-  (* height frac *)
-  | "h-" (num as n) "/" (num as m) {
-    let* pct = Gen.frac n m in
-    ["height: "; pct; ";"]
+    [Gen.decl "width" len]
   }
 
   (* height *)
+  | "h-[" ([^ '[' ']' '{' '}' '@']+ as v) "]" {
+    [Gen.decl "height" v]
+  }
+  | "h-" (num as n) "/" (num as m) {
+    let* pct = Gen.frac n m in
+    [Gen.decl "height" pct]
+  }
   | "h-" (height as key) {
     let* len = (Gen.len theme.spacing or Gen.height) key in
-    ["height: "; len; ";"]
+    [Gen.decl "height" len]
   }
 
   (* margin *)
   | ("-"? as minus) "m-" ((len | auto) as len) {
     let* len = Gen.len theme.spacing len in
-    ["margin: "; minus; len; ";"]
+    [Gen.decl "margin" (minus ^ len)]
   }
   | ("-"? as minus) "m" (side as side) "-" ((len | auto) as len) {
     let* side = Gen.side (String.make 1 side) in
     let* len = Gen.len theme.spacing len in
-    ["margin-"; side; ": "; minus; len; ";"]
+    [Gen.decl ("margin-" ^ side) (minus ^ len)]
   }
 
   (* z *)
   | "z-" ("0" | "10" | "20" | "30" | "40" | "50" | auto as key) {
-    ["z-index: "; key; ";"]
+    [Gen.decl "z-index" key]
   }
 
   (* basis *)
   | "basis-" (num as n) "/" (num as m) {
     let* pct = Gen.frac n m in
-    ["flex-basis: "; pct; ";"]
+    [Gen.decl "flex-basis" pct]
   }
-  | "basis-full" { ["flex-basis: 100%;"] }
+  | "basis-full" {
+    [Gen.decl "flex-basis" "100%"]
+  }
 
   (* opacity *)
   | "opacity-" (pct as key) {
     let* pct = Gen.pct key in
-    ["opacity: "; pct; ";"]
+    [Gen.decl "opacity" pct]
   }
 
   (* backdrop-opacity *)
@@ -392,207 +473,225 @@ rule read_utility state theme = parse
   (* justify-content *)
   | "justify-" (content as k) {
     let* v = Gen.content k in
-    ["justify-content: "; v; ";"]
+    [Gen.decl "justify-content" v]
   }
 
   (* justify-items *)
   | "justify-items-" (("start" | "end" | "center" | "stretch") as v) {
-    ["justify-items: "; v; ";"]
+    [Gen.decl "justify-items" v]
   }
 
   (* justify-self *)
   | "justify-self-" ((auto | "start" | "end" | "center" | "stretch") as v) {
-    ["justify-self: "; v; ";"]
+    [Gen.decl "justify-self" v]
   }
 
   (* align-content *)
   | "content-" ((content | "baseline") as k) {
     let* v = Gen.content k in
-    ["align-content: "; v; ";"]
+    [Gen.decl "align-content" v]
   }
 
   (* align-items *)
   | "items-" (("start" | "end" | "center" | "baseline" | "stretch") as k) {
     let* v = Gen.content k in
-    ["align-items: "; v; ";"]
+    [Gen.decl "align-items" v]
   }
 
   (* align-self *)
   | "self-" ((auto | "start" | "end" | "center" | "baseline" | "stretch") as k) {
     let* v = Gen.content k in
-    ["align-self: "; v; ";"]
+    [Gen.decl "align-self" v]
   }
 
   (* place-content *)
   | "place-content-" (("start" | "end" | "center" | "between" 
                       | "arount" | "evenly" | "baseline" | "stretch") as k) {
     let* v = Gen.content k in
-    ["place-content: "; v; ";"]
+    [Gen.decl "place-content" v]
   }
 
   (* place-items *)
   | "place-items-" (("start" | "end" | "center" | "baseline" | "stretch") as k) {
     let* v = Gen.content k in
-    ["place-items: "; v; ";"]
+    [Gen.decl "place-items" v]
   }
 
   (* place-self *)
   | "place-self-" ((auto | "start" | "end" | "center"  | "stretch") as k) {
     let* v = Gen.content k in
-    ["place-self: "; v; ";"]
+    [Gen.decl "place-self" v]
   }
 
   (* padding *)
   | "p-" (len as len) {
     let* len = Gen.len theme.spacing len in
-    ["padding: "; len; ";" ]
+    [Gen.decl "padding" len]
   }
   | "p" (side as side) "-" (len as len) {
     let* side = Gen.side (String.make 1 side) in
     let* len = Gen.len theme.spacing len in
-    ["padding-"; side; ": "; len; ";"]
+    [Gen.decl ("padding-" ^ side) len]
   }
 
   (* text *)
   | "text-" (text_size as text_size) {
     let* size, line_height = Gen.text theme text_size in
-    ["font-size: "; size; "; line-height: "; line_height; ";"]
+    [Gen.decl "font-size" size; Gen.decl "line-height" line_height]
   }
   | "text-" (suffix as color) {
     let* color = Gen.get theme.color color in
-    ["color: "; color; ";"]
+    [Gen.decl "color" color]
   }
 
   (* indent *)
   | "indent-" (len as len) {
     let* len = Gen.len theme.spacing len in
-    ["text-indent: "; len; ";"]
+    [Gen.decl "text-indent" len]
   }
 
   (* decoration *)
   | "decoration-" (suffix as color) {
     let* color = Gen.get theme.color color in
-    ["text-decoration-color: "; color; ";"]
+    [Gen.decl "text-decoration-color" color]
   }
 
   (* bg *)
-  | "bg-origin-" ("border" | "padding" | "content" as v) { ["background-origin: "; v; "-box;"] }
+  | "bg-origin-" ("border" | "padding" | "content" as v) {
+    [Gen.decl "background-origin" (v ^ "-box")]
+  }
   | "bg-" ("bottom" | "left" | "left-bottom" | "left-top" | "right" | "right-bottom" | "right-top" | "top" as v) {
     let v = String.map (function '-' -> ' ' | x -> x) v in
-    ["background-position: "; v;";"]
+    [Gen.decl "background-position" v]
   }
-  | "bg-repeat" {["background-repeat:repeat;"]}
-  | "bg-no-repeat" {["background-repeat:no-repeat;"]}
-  | "bg-repeat-" ( "x" | "y" | "round" | "space" as v) { ["background-repeat:repeat-"; v; ";"] }
-  | "bg-" ("auto" | "cover" | "contain" as v) { ["background-size: "; v;";"] }
-  | "bg-none" { ["background-image:none;"] }
+  | "bg-repeat" {
+    [Gen.decl "background-repeat" "repeat"]
+  }
+  | "bg-no-repeat" {
+    [Gen.decl "background-repeat" "no-repeat"]
+  }
+  | "bg-repeat-" ( "x" | "y" | "round" | "space" as v) {
+    [Gen.decl "background-repeat" ("repeat-" ^ v)]
+  }
+  | "bg-" ("auto" | "cover" | "contain" as v) {
+    [Gen.decl "background-size" v]
+  }
+  | "bg-none" {
+    [Gen.decl "background-image" "none"]
+  }
   | "bg-" (suffix as color) {
     let* color = Gen.get theme.color color in
-    ["background-color: "; color; ";"]
+    [Gen.decl "background-color" color]
   }
 
   (* border *)
-  | "border" { ["border-width: 1px;"] }
-  | "border-" (border_style as v) { ["border-style: "; v; ";"] }
+  | "border" {
+    [Gen.decl "border-width" "1px"]
+  }
+  | "border-" (border_style as v) {
+    [Gen.decl "border-style" v]
+  }
+  (* TODO: use var? *)
   | "border-" (side as side) {
     let* side = Gen.side (String.make 1 side) in
-    ["border-"; side; "-width: 1px;"]
+    [Gen.decl (concat ["border-"; side; "-width"]) "1px"]
   }
   | "border-" ('0' | '2' | '4' | '8' as px) {
     let* px = Gen.px (String.make 1 px) in
-    ["border-width: "; px; ";"]
+    [Gen.decl "border-width" px]
   }
   | "border-" (side as side) "-" ('0' | '2' | '4' | '8' as px) {
     let* side = Gen.side (String.make 1 side) in
     let* px = Gen.px (String.make 1 px) in
-    ["border-"; side; "-width: "; px; ";"]
+    [Gen.decl (concat ["border-"; side; "-width"]) px]
   }
   | "border-" (side as side) "-" (suffix as color) {
     let* side = Gen.side (String.make 1 side) in
     let* color = Gen.get theme.color color in
-    ["border-"; side; ": "; color; ";"]
+    [Gen.decl ("border-" ^ side) color]
   }
   | "border-" (suffix as color) {
     let* color = Gen.get theme.color color in
-    ["border-color: "; color; ";"]
+    [Gen.decl "border-color" color]
   }
 
-  (* divide *)
+  (* divide color *)
   | "divide-" (suffix as color) {
     let* color = Gen.get theme.color color in
-    ["border-color: "; color; ";"]
+    [Gen.decl "border-color" color]
   }
 
   (* outline *)
   | "outline-" (suffix as color) {
     let* color = Gen.get theme.color color in
-    ["outline-color: "; color; ";"]
+    [Gen.decl "outline-color" color]
   }
 
   (* ring *)
+  (* FIXME: use var API *)
   | "ring-" (suffix as color) {
-    let* color = Gen.get theme.color color in
-    ["--sx-ring-color: "; color; ";"]
+    let v = Gen.lookup theme.color color in
+    [Gen.var "sx-ring-color" v]
   }
 
   (* shadow *)
   | "shadow-" (suffix as suffix) {
-    let* box_shadow = Gen.(get theme.shadow or var "sx-shadow-color" theme.color) suffix in
-    ["box-shadow: "; box_shadow; ";"]
+    let* box_shadow = Gen.(get theme.shadow or get_var "sx-shadow-color" theme.color) suffix in
+    [Gen.decl "box-shadow" box_shadow]
   }
   | "shadow" {
     let* box_shadow = Gen.get theme.shadow "" in
-    ["box-shadow: "; box_shadow; ";"]
+    [Gen.decl "box-shadow" box_shadow]
   }
 
   (* accent *)
   | "accent-auto" { ["accent-color:auto;"] }
   | "accent-" (suffix as color) {
     let* color = Gen.get theme.color color in
-    ["accent-color: "; color; ";"]
+    [Gen.decl "accent-color" color]
   }
 
   (* caret *)
   | "caret-" (suffix as color) {
     let* color = Gen.get theme.color color in
-    ["caret-color: "; color; ";"]
+    [Gen.decl "caret-color" color]
   }
 
   (* scroll-margin *)
   | "scroll-m-" (len as len) {
     let* len = Gen.len theme.spacing len in
-    ["scroll-margin: "; len; ";" ]
+    [Gen.decl "scroll-margin" len]
   }
   | "scroll-m" (side as side) "-" (len as len) {
     let* side = Gen.side (String.make 1 side) in
     let* len = Gen.len theme.spacing len in
-    ["scroll-margin-"; side; ": "; len; ";"]
+    [Gen.decl ("scroll-margin-" ^ side)  len]
   }
 
   (* scroll-padding *)
   | "scroll-p-" (len as len) {
     let* len = Gen.len theme.spacing len in
-    ["scroll-padding: "; len; ";" ]
+    [Gen.decl "scroll-padding" len]
   }
   | "scroll-p" (side as side) "-" (len as len) {
     let* side = Gen.side (String.make 1 side) in
     let* len = Gen.len theme.spacing len in
-    ["scroll-padding-"; side; ": "; len; ";"]
+    [Gen.decl ("scroll-padding-" ^ side) len]
   }
 
   (* fill *)
   | "fill-" (suffix as color) {
     let* color = Gen.get theme.color color in
-    ["fill: "; color; ";"]
+    [Gen.decl "fill" color]
   }
 
   (* stroke *)
   | "stroke-" ("0" | "1" | "2" as v) {
-    ["stroke-width: "; String.make 1 v; ";"]
+    [Gen.decl "stroke-width" (String.make 1 v)]
   }
   | "stroke-" (suffix as color) {
     let* color = Gen.get theme.color color in
-    ["stroke: "; color; ";"]
+    [Gen.decl "stroke" color]
   }
 
   (* custom *)
@@ -631,7 +730,7 @@ and read state theme out = parse
   | eof { out }
   | "" {
     try
-      let properties = String.concat "" (read_utility state theme lexbuf) in
+      let properties = String.concat ";" (read_utility state theme lexbuf) in
       let utility = Lexing.lexeme lexbuf in
       if has_delim lexbuf then
         let selector = Css.make_selector_name ~scope:state.scope ~variants:state.variants ~utility in

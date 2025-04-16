@@ -376,8 +376,8 @@ let default =
   in
   let text_size =
     [
-      ("xs", "0.75rem");
-      ("sm", "0.875rem");
+      ("xs", ".75rem");
+      ("sm", ".875rem");
       ("base", "1rem");
       ("lg", "1.125rem");
       ("xl", "1.25rem");
@@ -393,14 +393,14 @@ let default =
   in
   let text_line_height =
     [
-      ("xs", "calc(1 / 0.75)");
-      ("sm", "calc(1.25 / 0.875)");
-      ("base", "calc(1.5 / 1)");
-      ("lg", "calc(1.75 / 1.125)");
-      ("xl", "calc(1.75 / 1.25)");
-      ("2xl", "calc(2 / 1.5)");
-      ("3xl", "calc(2.25 / 1.875)");
-      ("4xl", "calc(2.5 / 2.25)");
+      ("xs", "1rem");
+      ("sm", "1.25rem");
+      ("base", "1.5rem");
+      ("lg", "1.75rem");
+      ("xl", "1.75rem");
+      ("2xl", "2rem");
+      ("3xl", "2.25rem");
+      ("4xl", "2.5rem");
       ("5xl", "1");
       ("6xl", "1");
       ("7xl", "1");
