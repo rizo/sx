@@ -2,7 +2,7 @@ let print ?(break : unit Fmt.t = Format.pp_print_newline) fmt =
   Format.kfprintf (fun f -> break f ()) Format.std_formatter fmt
 
 module Rematch : sig
-  type +'a t
+  type 'a t
   (** The compiled state of the regular expression matcher.
 
       The type variable ['a] is the type of the matching cases. This is similar
@@ -26,40 +26,41 @@ module Rematch : sig
   val re : 'a t -> Re.re
   (** The underlying compiled regular expression. *)
 end = struct
-  module Mark_map = Map.Make (Re.Mark)
+  type 'a t = { marks : (Re.Mark.t, Re.Group.t -> 'a) Hashtbl.t; re : Re.re }
 
-  type +'a t = { ks : (Re.Group.t -> 'a) Mark_map.t; re : Re.re }
+  let compile case_list =
+    let case_count = ref 0 in
+    let case_list_rev =
+      List.fold_left
+        (fun acc case ->
+          incr case_count;
+          case :: acc)
+        [] case_list
+    in
+    let marks = Hashtbl.create !case_count in
+    (* Reverses to the original order since leftmost cases are preferred. *)
+    let expr_list =
+      List.fold_left
+        (fun acc (case_expr, case_action) ->
+          let mark, case_expr' = Re.mark case_expr in
+          Hashtbl.add marks mark case_action;
+          case_expr' :: acc)
+        [] case_list_rev
+    in
+    { marks; re = Re.compile (Re.longest (Re.alt expr_list)) }
 
-  let compile cases0 =
-    match cases0 with
-    | (re0, k0) :: cases' ->
-      let m0, re0' = Re.mark re0 in
-      let ctx0 = Mark_map.singleton m0 k0 in
-      let n, ks, acc =
-        List.fold_left
-          (fun (n, ctx, acc) (re, k) ->
-            let m, re' = Re.mark re in
-            let ctx' = Mark_map.add m k ctx in
-            let acc' = Re.alt [ re'; acc ] in
-            (n + 1, ctx', acc'))
-          (0, ctx0, re0') cases'
-      in
-      print "Count: %d" n;
-      { ks; re = Re.compile (Re.longest acc) }
-    | [] -> invalid_arg "empty cases"
-
-  let exec { ks; re } input =
-    match Re.exec_opt re input with
+  let exec rematch input =
+    match Re.exec_opt rematch.re input with
     | None -> None
     | Some g ->
       let marks = Re.Mark.all g in
       (* NOTE: Having more marks in the matching g indicates a conflict? *)
       (* NOTE: We may want to simply ignore unknown marks. *)
       assert (Re.Mark.Set.cardinal marks = 1);
-      let m = Re.Mark.Set.min_elt marks in
-      print "Mark: %d" (Obj.magic m);
-      let k = Mark_map.find m ks in
-      Some (k g)
+      let mark = Re.Mark.Set.min_elt marks in
+      print "Mark: %d" (Obj.magic mark);
+      let action = Hashtbl.find rematch.marks mark in
+      Some (action g)
 
   let re t = t.re
 end
