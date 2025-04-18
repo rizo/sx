@@ -2,4 +2,4 @@
 
 (library
  (name sx)
- (libraries fmt yojson))
+ (libraries fmt yojson shaper))

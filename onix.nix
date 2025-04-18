@@ -17,5 +17,6 @@ in onix.env {
     "ocaml-base-compiler" = "5.2.1";
     "ocaml-lsp-server" = "*";
     "ocamlformat" = "*";
+    "ocp-browser" = "*";
   };
 }

@@ -21,7 +21,7 @@ bg = {
 };
 
 margin = {
-  (neg = "-"?) "m-" (s = theme.side) "-" (l = theme.len) => {
+  (neg = "-"?) "m" (s = theme.side) "-" (l = theme.len) => {
     "margin-" s = neg l
   },
   (neg = "-"?) "m-" (l = len) => {

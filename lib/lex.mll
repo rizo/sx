@@ -180,10 +180,10 @@ rule read_utility state theme = parse
     [Gen.decl "aspect-ratio" "16/9"]
   }
 
-  (* columns *)
   | "columns-" (['0'-'9'] | ('1' ('0' | '1' | '2') | auto) as v) {
     [Gen.decl "columns" v]
   }
+
   | "columns-" (size as size) {
     let* size = Gen.get theme.size size in
     [Gen.decl "columns" size]
@@ -635,10 +635,20 @@ rule read_utility state theme = parse
   }
 
   (* shadow *)
-  | "shadow-" (suffix as suffix) {
-    let* box_shadow = Gen.(get theme.shadow or get_var "sx-shadow-color" theme.color) suffix in
-    [Gen.decl "box-shadow" box_shadow]
+
+  | "shadow-" (suffix as key) {
+    try
+      let* v = Gen.get theme.shadow key in
+      [Gen.decl "box-shadow" v]
+    with Gen.Unknown_key _ ->
+      let v = Gen.lookup theme.color key in
+      [Gen.var "sx-shadow-color" v]
   }
+
+  (*| "shadow-" (suffix as suffix) {*)
+  (*  let* v = Gen.(get theme.shadow or get_var "sx-shadow-color" theme.color) suffix in*)
+  (*  [Gen.decl "box-shadow" v]*)
+  (*}*)
   | "shadow" {
     let* box_shadow = Gen.get theme.shadow "" in
     [Gen.decl "box-shadow" box_shadow]

@@ -36,7 +36,8 @@ function classNameToCss(className) {
       }
     }
   }
-  return gen("@tailwind utilities;", config).then((result) => {
+  let input = "@tailwind utilities;";
+  return gen(input, config).then((result) => {
     return format(result.css);
   })
 }

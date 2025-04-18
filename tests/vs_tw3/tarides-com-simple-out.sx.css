@@ -1,0 +1,608 @@
+.columns-md{columns:28rem}
+.columns-lg{columns:32rem}
+.columns-xl{columns:36rem}
+.columns-2xl{columns:42rem}
+error: input="-inset-0.5": Failure("lexing: empty token")
+.-mb-px{margin-bottom:-1px}
+.-ml-0\.5{margin-left:-.125rem}
+.-ml-1{margin-left:-.25rem}
+.-ml-16{margin-left:-4rem}
+.-ml-2{margin-left:-.5rem}
+.-ml-3{margin-left:-.75rem}
+.-ml-4{margin-left:-1rem}
+.-mt-2{margin-top:-.5rem}
+.-mt-3{margin-top:-.75rem}
+.-mt-4{margin-top:-1rem}
+.-mt-56{margin-top:-14rem}
+error: input="-outline-offset-1": Failure("lexing: empty token")
+error: input="-space-x-1": Failure("lexing: empty token")
+error: input="-translate-x-1/2": Failure("lexing: empty token")
+error: input="-translate-x-full": Failure("lexing: empty token")
+error: input="-translate-y-1/2": Failure("lexing: empty token")
+error: input="-z-10": Failure("lexing: empty token")
+@media (width>=768px){.md\:w-1\/3{width:33.3333%}}
+.absolute{position:absolute}
+error: input="antialiased": Failure("lexing: empty token")
+error: input="appearance-none": Failure("lexing: empty token")
+error: input="aspect-[1097/845]": Failure("lexing: empty token")
+error: input="aspect-[1108/632]": Failure("lexing: empty token")
+error: input="aspect-[1318/752]": Failure("lexing: empty token")
+error: input="aspect-[16/9]": Failure("lexing: empty token")
+error: input="aspect-[3/2]": Failure("lexing: empty token")
+error: input="aspect-[9/4]": Failure("lexing: empty token")
+.aspect-video{aspect-ratio:16/9}
+error: input="auto-rows-fr": Failure("lexing: empty token")
+.bg-blue-50{background-color:oklch(0.97 0.014 254.604)}
+.bg-blue-950{background-color:oklch(0.282 0.091 267.935)}
+.bg-cover{background-size:cover}
+error: input="bg-gradient-to-br": Failure("lexing: empty token")
+error: input="bg-gradient-to-r": Failure("lexing: empty token")
+error: input="bg-gradient-to-t": Failure("lexing: empty token")
+error: input="bg-gradient-to-tr": Failure("lexing: empty token")
+.bg-gray-100{background-color:oklch(0.967 0.003 264.542)}
+.bg-gray-200{background-color:oklch(0.928 0.006 264.531)}
+.bg-gray-50{background-color:oklch(0.985 0.002 247.839)}
+.bg-gray-500{background-color:oklch(0.551 0.027 264.364)}
+.bg-gray-900{background-color:oklch(0.21 0.034 264.665)}
+error: input="bg-gray-900/10": Failure("lexing: empty token")
+.bg-green-100{background-color:oklch(0.962 0.044 156.743)}
+.bg-green-50{background-color:oklch(0.982 0.018 155.826)}
+.bg-no-repeat{background-repeat:no-repeat}
+error: input="bg-opacity-75": Failure("lexing: empty token")
+.bg-right-top{background-position:right top}
+.bg-sky-50{background-color:oklch(0.977 0.013 236.62)}
+.bg-sky-600{background-color:oklch(0.588 0.158 241.966)}
+.bg-sky-700{background-color:oklch(0.5 0.134 242.749)}
+.bg-sky-900{background-color:oklch(0.391 0.09 240.876)}
+.bg-slate-50{background-color:oklch(0.984 0.003 247.858)}
+.bg-teal-600{background-color:oklch(0.6 0.118 184.704)}
+.bg-teal-800{background-color:oklch(0.437 0.078 188.216)}
+.bg-white{background-color:#fff}
+error: input="bg-white/5": Failure("lexing: empty token")
+.bg-yellow-400{background-color:oklch(0.852 0.199 91.936)}
+.block{display:block}
+error: input="blur-3xl": Failure("lexing: empty token")
+.border{border-width:1px}
+.border-0{border-width:0}
+.border-2{border-width:2px}
+.border-b{border-bottom-width:1px}
+.border-b-2{border-bottom-width:2px}
+.border-gray-200{border-color:oklch(0.928 0.006 264.531)}
+.border-gray-300{border-color:oklch(0.872 0.01 258.338)}
+error: input="border-gray-900/10": Failure("lexing: empty token")
+error: input="border-gray-900/5": Failure("lexing: empty token")
+.border-l-4{border-left-width:4px}
+.border-none{border-style:none}
+.border-sky-500{border-color:oklch(0.685 0.169 237.323)}
+.border-sky-600{border-color:oklch(0.588 0.158 241.966)}
+.border-solid{border-style:solid}
+.border-t{border-top-width:1px}
+.border-teal-600{border-color:oklch(0.6 0.118 184.704)}
+.border-teal-800{border-color:oklch(0.437 0.078 188.216)}
+.border-transparent{border-color:transparent}
+.border-white{border-color:#fff}
+error: input="brightness-125": Failure("lexing: empty token")
+error: input="col-span-2": Failure("lexing: empty token")
+error: input="col-start-1": Failure("lexing: empty token")
+error: input="cursor-pointer": Failure("lexing: empty token")
+error: input="dark:bg-gray-600": Failure("lexing: empty token")
+.divide-gray-100{border-color:oklch(0.967 0.003 264.542)}
+error: input="divide-sky-800/10": Failure("lexing: empty token")
+.divide-slate-500{border-color:oklch(0.554 0.046 257.417)}
+error: input="divide-y": Failure("lexing: empty token")
+error: input="divide-y-2": Failure("lexing: empty token")
+.fill-gray-50{fill:oklch(0.985 0.002 247.839)}
+.fill-gray-500{fill:oklch(0.551 0.027 264.364)}
+.fill-white{fill:#fff}
+error: input="fill-white/50": Failure("lexing: empty token")
+.fixed{position:fixed}
+.flex{display:flex}
+error: input="flex-1": Failure("lexing: empty token")
+error: input="flex-auto": Failure("lexing: empty token")
+error: input="flex-col": Failure("lexing: empty token")
+error: input="flex-grow": Failure("lexing: empty token")
+error: input="flex-none": Failure("lexing: empty token")
+error: input="flex-row": Failure("lexing: empty token")
+error: input="flex-shrink-0": Failure("lexing: empty token")
+error: input="flex-wrap": Failure("lexing: empty token")
+error: input="focus-visible:outline": Failure("lexing: empty token")
+error: input="focus-visible:outline-2": Failure("lexing: empty token")
+.focus-visible\:outline-indigo-600:focus-visible{outline-color:oklch(0.511 0.262 276.966)}
+error: input="focus-visible:outline-offset-2": Failure("lexing: empty token")
+error: input="focus:-outline-offset-2": Failure("lexing: empty token")
+error: input="focus:outline": Failure("lexing: empty token")
+error: input="focus:outline-2": Failure("lexing: empty token")
+error: input="focus:outline-none": Failure("lexing: empty token")
+.focus\:outline-teal-600:focus{outline-color:oklch(0.6 0.118 184.704)}
+error: input="focus:ring-0": Failure("lexing: empty token")
+error: input="focus:ring-2": Failure("lexing: empty token")
+error: input="focus:ring-inset": Failure("lexing: empty token")
+.focus\:ring-sky-500:focus{--sx-ring-color: oklch(0.685 0.169 237.323);}
+.focus\:ring-sky-600:focus{--sx-ring-color: oklch(0.588 0.158 241.966);}
+.focus\:ring-teal-600:focus{--sx-ring-color: oklch(0.6 0.118 184.704);}
+error: input="font-bold": Failure("lexing: empty token")
+error: input="font-medium": Failure("lexing: empty token")
+error: input="font-semibold": Failure("lexing: empty token")
+error: input="from-[#80caff]": Failure("lexing: empty token")
+error: input="from-blue-100": Failure("lexing: empty token")
+error: input="from-blue-200": Failure("lexing: empty token")
+error: input="from-blue-50": Failure("lexing: empty token")
+error: input="from-gray-900": Failure("lexing: empty token")
+error: input="from-sky-950": Failure("lexing: empty token")
+error: input="from-teal-400": Failure("lexing: empty token")
+.gap-16{gap:4rem}
+.gap-4{gap:1rem}
+.gap-8{gap:2rem}
+.gap-x-0{column-gap:0}
+.gap-x-1{column-gap:.25rem}
+.gap-x-10{column-gap:2.5rem}
+.gap-x-12{column-gap:3rem}
+.gap-x-2{column-gap:.5rem}
+.gap-x-2\.5{column-gap:.625rem}
+.gap-x-3{column-gap:.75rem}
+.gap-x-4{column-gap:1rem}
+.gap-x-6{column-gap:1.5rem}
+.gap-x-8{column-gap:2rem}
+.gap-y-1{row-gap:.25rem}
+.gap-y-10{row-gap:2.5rem}
+.gap-y-12{row-gap:3rem}
+.gap-y-16{row-gap:4rem}
+.gap-y-2{row-gap:.5rem}
+.gap-y-3{row-gap:.75rem}
+.gap-y-4{row-gap:1rem}
+.gap-y-6{row-gap:1.5rem}
+.gap-y-8{row-gap:2rem}
+error: input="grayscale": Failure("lexing: empty token")
+.grid{display:grid}
+error: input="grid-cols-1": Failure("lexing: empty token")
+error: input="grid-cols-2": Failure("lexing: empty token")
+.h-0\.5{height:.125rem}
+.h-1{height:.25rem}
+.h-1\/3{height:33.3333%}
+.h-10{height:2.5rem}
+.h-12{height:3rem}
+.h-14{height:3.5rem}
+.h-20{height:5rem}
+.h-32{height:8rem}
+.h-4{height:1rem}
+.h-5{height:1.25rem}
+.h-6{height:1.5rem}
+.h-7{height:1.75rem}
+.h-8{height:2rem}
+.h-96{height:24rem}
+.h-auto{height:auto}
+.h-full{height:100%}
+.h-px{height:1px}
+.hidden{display:none}
+.hover\:bg-blue-900:hover{background-color:oklch(0.379 0.146 265.522)}
+.hover\:bg-gray-100:hover{background-color:oklch(0.967 0.003 264.542)}
+.hover\:bg-gray-50:hover{background-color:oklch(0.985 0.002 247.839)}
+.hover\:bg-none:hover{background-image:none}
+.hover\:bg-sky-600:hover{background-color:oklch(0.588 0.158 241.966)}
+.hover\:bg-sky-800:hover{background-color:oklch(0.443 0.11 240.79)}
+.hover\:bg-teal-800:hover{background-color:oklch(0.437 0.078 188.216)}
+.hover\:border-blue-900:hover{border-color:oklch(0.379 0.146 265.522)}
+.hover\:border-gray-300:hover{border-color:oklch(0.872 0.01 258.338)}
+.hover\:border-teal-800:hover{border-color:oklch(0.437 0.078 188.216)}
+.hover\:opacity-100:hover{opacity:1}
+.hover\:opacity-70:hover{opacity:.7}
+.hover\:ring-slate-300:hover{--sx-ring-color: oklch(0.869 0.022 252.894);}
+.hover\:text-gray-500:hover{color:oklch(0.551 0.027 264.364)}
+.hover\:text-gray-700:hover{color:oklch(0.373 0.034 259.733)}
+.hover\:text-sky-200:hover{color:oklch(0.901 0.058 230.902)}
+.hover\:text-sky-600:hover{color:oklch(0.588 0.158 241.966)}
+.hover\:text-sky-800:hover{color:oklch(0.443 0.11 240.79)}
+.hover\:text-teal-800:hover{color:oklch(0.437 0.078 188.216)}
+.hover\:text-white:hover{color:#fff}
+.inline{display:inline}
+.inline-block{display:inline-block}
+.inline-flex{display:inline-flex}
+.inset-0{inset:0}
+.inset-x-0{left:0;right:0}
+.inset-y-0{top:0;bottom:0}
+.isolate{isolation:isolate}
+.items-center{align-items:center}
+.items-end{align-items:flex-end}
+.items-start{align-items:flex-start}
+.items-stretch{align-items:stretch}
+.justify-around{justify-content:space-around}
+.justify-between{justify-content:space-between}
+.justify-center{justify-content:center}
+.justify-end{justify-content:flex-end}
+.justify-self-end{justify-self:end}
+error: input="leading-10": Failure("lexing: empty token")
+error: input="leading-5": Failure("lexing: empty token")
+error: input="leading-6": Failure("lexing: empty token")
+error: input="leading-7": Failure("lexing: empty token")
+error: input="leading-8": Failure("lexing: empty token")
+error: input="leading-none": Failure("lexing: empty token")
+error: input="leading-snug": Failure("lexing: empty token")
+.left-0{left:0}
+.left-1\/2{left:50%}
+@media (width>=1024px){.lg\:-mr-6{margin-right:-1.5rem}}
+@media (width>=1024px){.lg\:absolute{position:absolute}}
+error: input="lg:aspect-[3/2]": Failure("lexing: empty token")
+@media (width>=1024px){.lg\:aspect-auto{aspect-ratio:auto}}
+@media (width>=1024px){.lg\:aspect-square{aspect-ratio:1/1}}
+@media (width>=1024px){.lg\:block{display:block}}
+error: input="lg:col-span-1": Failure("lexing: empty token")
+error: input="lg:col-span-2": Failure("lexing: empty token")
+error: input="lg:col-span-3": Failure("lexing: empty token")
+error: input="lg:col-span-6": Failure("lexing: empty token")
+error: input="lg:flex-auto": Failure("lexing: empty token")
+error: input="lg:flex-row": Failure("lexing: empty token")
+error: input="lg:flex-row-reverse": Failure("lexing: empty token")
+@media (width>=1024px){.lg\:gap-x-16{column-gap:4rem}}
+@media (width>=1024px){.lg\:gap-x-6{column-gap:1.5rem}}
+@media (width>=1024px){.lg\:grid{display:grid}}
+error: input="lg:grid-cols-12": Failure("lexing: empty token")
+error: input="lg:grid-cols-2": Failure("lexing: empty token")
+error: input="lg:grid-cols-3": Failure("lexing: empty token")
+error: input="lg:grid-cols-4": Failure("lexing: empty token")
+error: input="lg:grid-cols-5": Failure("lexing: empty token")
+@media (width>=1024px){.lg\:h-auto{height:auto}}
+@media (width>=1024px){.lg\:h-full{height:100%}}
+@media (width>=1024px){.lg\:inset-0{inset:0}}
+@media (width>=1024px){.lg\:items-center{align-items:center}}
+@media (width>=1024px){.lg\:left-1\/2{left:50%}}
+error: input="lg:max-w-2xl": Failure("lexing: empty token")
+error: input="lg:max-w-3xl": Failure("lexing: empty token")
+error: input="lg:max-w-lg": Failure("lexing: empty token")
+error: input="lg:max-w-none": Failure("lexing: empty token")
+error: input="lg:max-w-sm": Failure("lexing: empty token")
+error: input="lg:max-w-xl": Failure("lexing: empty token")
+@media (width>=1024px){.lg\:mb-12{margin-bottom:3rem}}
+@media (width>=1024px){.lg\:ml-6{margin-left:1.5rem}}
+@media (width>=1024px){.lg\:ml-8{margin-left:2rem}}
+@media (width>=1024px){.lg\:mr-0{margin-right:0}}
+@media (width>=1024px){.lg\:mt-24{margin-top:6rem}}
+@media (width>=1024px){.lg\:mx-0{margin-left:0;margin-right:0}}
+@media (width>=1024px){.lg\:pb-8{padding-bottom:2rem}}
+@media (width>=1024px){.lg\:pl-8{padding-left:2rem}}
+@media (width>=1024px){.lg\:pr-4{padding-right:1rem}}
+@media (width>=1024px){.lg\:pt-4{padding-top:1rem}}
+@media (width>=1024px){.lg\:pt-80{padding-top:20rem}}
+@media (width>=1024px){.lg\:px-0{padding-left:0;padding-right:0}}
+@media (width>=1024px){.lg\:px-8{padding-left:2rem;padding-right:2rem}}
+@media (width>=1024px){.lg\:py-20{padding-top:5rem;padding-bottom:5rem}}
+@media (width>=1024px){.lg\:static{position:static}}
+@media (width>=1024px){.lg\:text-5xl{font-size:3rem;line-height:1}}
+error: input="lg:translate-x-0": Failure("lexing: empty token")
+@media (width>=1024px){.lg\:w-1\/2{width:50%}}
+@media (width>=1024px){.lg\:w-auto{width:auto}}
+error: input="line-clamp-2": Failure("lexing: empty token")
+error: input="line-clamp-3": Failure("lexing: empty token")
+error: input="list-disc": Failure("lexing: empty token")
+.list-item{display:list-item}
+error: input="list-none": Failure("lexing: empty token")
+.m-1{margin:.25rem}
+error: input="max-h-12": Failure("lexing: empty token")
+error: input="max-w-2xl": Failure("lexing: empty token")
+error: input="max-w-3xl": Failure("lexing: empty token")
+error: input="max-w-5xl": Failure("lexing: empty token")
+error: input="max-w-7xl": Failure("lexing: empty token")
+error: input="max-w-full": Failure("lexing: empty token")
+error: input="max-w-lg": Failure("lexing: empty token")
+error: input="max-w-md": Failure("lexing: empty token")
+error: input="max-w-none": Failure("lexing: empty token")
+error: input="max-w-sm": Failure("lexing: empty token")
+error: input="max-w-xl": Failure("lexing: empty token")
+.mb-1{margin-bottom:.25rem}
+.mb-2{margin-bottom:.5rem}
+.mb-3{margin-bottom:.75rem}
+.mb-4{margin-bottom:1rem}
+error: input="md:flex-row": Failure("lexing: empty token")
+error: input="md:flex-row-reverse": Failure("lexing: empty token")
+error: input="md:grid-cols-2": Failure("lexing: empty token")
+@media (width>=768px){.md\:mx-4{margin-left:1rem;margin-right:1rem}}
+@media (width>=768px){.md\:pl-10{padding-left:2.5rem}}
+error: input="md:space-x-4": Failure("lexing: empty token")
+@media (width>=768px){.md\:w-2\/3{width:66.6667%}}
+@media (width>=768px){.md\:w-48{width:12rem}}
+@media (width>=768px){.md\:w-96{width:24rem}}
+error: input="min-h-[calc(100vh-6rem)]": Failure("lexing: empty token")
+error: input="min-h-full": Failure("lexing: empty token")
+error: input="min-h-screen": Failure("lexing: empty token")
+error: input="min-w-0": Failure("lexing: empty token")
+error: input="min-w-full": Failure("lexing: empty token")
+error: input="mix-blend-multiply": Failure("lexing: empty token")
+.ml-2{margin-left:.5rem}
+.ml-4{margin-left:1rem}
+.ml-8{margin-left:2rem}
+.mr-1{margin-right:.25rem}
+.mr-1\.5{margin-right:.375rem}
+.mr-2{margin-right:.5rem}
+.mr-3{margin-right:.75rem}
+.mr-4{margin-right:1rem}
+.mr-8{margin-right:2rem}
+.mt-1{margin-top:.25rem}
+.mt-10{margin-top:2.5rem}
+.mt-12{margin-top:3rem}
+.mt-16{margin-top:4rem}
+.mt-2{margin-top:.5rem}
+.mt-2\.5{margin-top:.625rem}
+.mt-24{margin-top:6rem}
+.mt-3{margin-top:.75rem}
+.mt-4{margin-top:1rem}
+.mt-5{margin-top:1.25rem}
+.mt-6{margin-top:1.5rem}
+.mt-8{margin-top:2rem}
+.mt-auto{margin-top:auto}
+.mx-0{margin-left:0;margin-right:0}
+.mx-12{margin-left:3rem;margin-right:3rem}
+.mx-2{margin-left:.5rem;margin-right:.5rem}
+.mx-auto{margin-left:auto;margin-right:auto}
+.my-1{margin-top:.25rem;margin-bottom:.25rem}
+.my-3{margin-top:.75rem;margin-bottom:.75rem}
+.my-4{margin-top:1rem;margin-bottom:1rem}
+.my-8{margin-top:2rem;margin-bottom:2rem}
+error: input="no-underline": Failure("lexing: empty token")
+error: input="object-bottom": Failure("lexing: empty token")
+.object-contain{object-fit:contain}
+.object-cover{object-fit:cover}
+.object-scale-down{object-fit:scale-down}
+.opacity-25{opacity:.25}
+.opacity-30{opacity:.3}
+.opacity-40{opacity:.4}
+.opacity-60{opacity:.6}
+.opacity-70{opacity:.7}
+error: input="outline": Failure("lexing: empty token")
+error: input="outline-1": Failure("lexing: empty token")
+.outline-gray-300{outline-color:oklch(0.872 0.01 258.338)}
+error: input="overflow-auto": Failure("lexing: empty token")
+error: input="overflow-clip": Failure("lexing: empty token")
+error: input="overflow-hidden": Failure("lexing: empty token")
+error: input="overflow-visible": Failure("lexing: empty token")
+error: input="overflow-y-auto": Failure("lexing: empty token")
+.p-1{padding:.25rem}
+.p-2{padding:.5rem}
+.p-4{padding:1rem}
+.pb-0{padding-bottom:0}
+.pb-10{padding-bottom:2.5rem}
+.pb-12{padding-bottom:3rem}
+.pb-16{padding-bottom:4rem}
+.pb-2{padding-bottom:.5rem}
+.pb-24{padding-bottom:6rem}
+.pb-4{padding-bottom:1rem}
+.pb-5{padding-bottom:1.25rem}
+.pb-8{padding-bottom:2rem}
+.pb-9{padding-bottom:2.25rem}
+.pl-0{padding-left:0}
+.pl-2{padding-left:.5rem}
+.pl-3{padding-left:.75rem}
+.pl-4{padding-left:1rem}
+.pl-5{padding-left:1.25rem}
+.pl-9{padding-left:2.25rem}
+error: input="placeholder:text-gray-400": Failure("lexing: empty token")
+error: input="pointer-events-auto": Failure("lexing: empty token")
+error: input="pointer-events-none": Failure("lexing: empty token")
+.pr-3{padding-right:.75rem}
+.pr-4{padding-right:1rem}
+.pr-8{padding-right:2rem}
+.pt-0{padding-top:0}
+.pt-1{padding-top:.25rem}
+.pt-10{padding-top:2.5rem}
+.pt-12{padding-top:3rem}
+.pt-16{padding-top:4rem}
+.pt-2{padding-top:.5rem}
+.pt-24{padding-top:6rem}
+.pt-3{padding-top:.75rem}
+.pt-4{padding-top:1rem}
+.pt-5{padding-top:1.25rem}
+.pt-56{padding-top:14rem}
+.pt-64{padding-top:16rem}
+.pt-8{padding-top:2rem}
+.pt-80{padding-top:20rem}
+.px-2{padding-left:.5rem;padding-right:.5rem}
+.px-3{padding-left:.75rem;padding-right:.75rem}
+.px-3\.5{padding-left:.875rem;padding-right:.875rem}
+.px-4{padding-left:1rem;padding-right:1rem}
+.px-5{padding-left:1.25rem;padding-right:1.25rem}
+.px-6{padding-left:1.5rem;padding-right:1.5rem}
+.px-8{padding-left:2rem;padding-right:2rem}
+.py-0{padding-top:0;padding-bottom:0}
+.py-1{padding-top:.25rem;padding-bottom:.25rem}
+.py-12{padding-top:3rem;padding-bottom:3rem}
+.py-16{padding-top:4rem;padding-bottom:4rem}
+.py-2{padding-top:.5rem;padding-bottom:.5rem}
+.py-2\.5{padding-top:.625rem;padding-bottom:.625rem}
+.py-24{padding-top:6rem;padding-bottom:6rem}
+.py-3\.5{padding-top:.875rem;padding-bottom:.875rem}
+.py-4{padding-top:1rem;padding-bottom:1rem}
+.py-5{padding-top:1.25rem;padding-bottom:1.25rem}
+.py-8{padding-top:2rem;padding-bottom:2rem}
+.relative{position:relative}
+.right-0{right:0}
+error: input="ring-1": Failure("lexing: empty token")
+error: input="ring-2": Failure("lexing: empty token")
+.ring-gray-300{--sx-ring-color: oklch(0.872 0.01 258.338);}
+error: input="ring-gray-900/10": Failure("lexing: empty token")
+error: input="ring-inset": Failure("lexing: empty token")
+error: input="ring-slate-900/10": Failure("lexing: empty token")
+.ring-white{--sx-ring-color: #fff;}
+error: input="ring-white/10": Failure("lexing: empty token")
+error: input="rounded": Failure("lexing: empty token")
+error: input="rounded-2xl": Failure("lexing: empty token")
+error: input="rounded-3xl": Failure("lexing: empty token")
+error: input="rounded-full": Failure("lexing: empty token")
+error: input="rounded-l-md": Failure("lexing: empty token")
+error: input="rounded-l-xl": Failure("lexing: empty token")
+error: input="rounded-lg": Failure("lexing: empty token")
+error: input="rounded-md": Failure("lexing: empty token")
+error: input="rounded-r-md": Failure("lexing: empty token")
+error: input="rounded-xl": Failure("lexing: empty token")
+error: input="row-start-1": Failure("lexing: empty token")
+error: input="saturate-0": Failure("lexing: empty token")
+error: input="scale-150": Failure("lexing: empty token")
+.self-center{align-self:center}
+.shadow{box-shadow:0 1px 3px 0 var(--sx-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--sx-shadow-color, rgb(0 0 0 / 0.1))}
+.shadow-2xl{box-shadow:0 25px 50px -12px var(--sx-shadow-color, rgb(0 0 0 / 0.25))}
+.shadow-lg{box-shadow:0 10px 15px -3px var(--sx-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--sx-shadow-color, rgb(0 0 0 / 0.1))}
+.shadow-sm{box-shadow:0 1px 3px 0 var(--sx-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--sx-shadow-color, rgb(0 0 0 / 0.1))}
+.shadow-xl{box-shadow:0 20px 25px -5px var(--sx-shadow-color, rgb(0 0 0 / 0.1)), 0 8px 10px -6px var(--sx-shadow-color, rgb(0 0 0 / 0.1))}
+error: input="shrink-0": Failure("lexing: empty token")
+error: input="size-5": Failure("lexing: empty token")
+@media (width>=640px){.sm\:-ml-4{margin-left:-1rem}}
+@media (width>=640px){.sm\:absolute{position:absolute}}
+error: input="sm:aspect-[2/1]": Failure("lexing: empty token")
+@media (width>=640px){.sm\:block{display:block}}
+error: input="sm:col-span-2": Failure("lexing: empty token")
+error: input="sm:col-span-4": Failure("lexing: empty token")
+error: input="sm:col-span-5": Failure("lexing: empty token")
+error: input="sm:divide-x": Failure("lexing: empty token")
+error: input="sm:divide-y-0": Failure("lexing: empty token")
+@media (width>=640px){.sm\:flex{display:flex}}
+error: input="sm:flex-col": Failure("lexing: empty token")
+error: input="sm:flex-row": Failure("lexing: empty token")
+error: input="sm:flex-row-reverse": Failure("lexing: empty token")
+@media (width>=640px){.sm\:gap-x-16{column-gap:4rem}}
+@media (width>=640px){.sm\:gap-y-14{row-gap:3.5rem}}
+@media (width>=640px){.sm\:gap-y-16{row-gap:4rem}}
+@media (width>=640px){.sm\:gap-y-20{row-gap:5rem}}
+@media (width>=640px){.sm\:gap-y-24{row-gap:6rem}}
+@media (width>=640px){.sm\:grid{display:grid}}
+error: input="sm:grid-cols-2": Failure("lexing: empty token")
+error: input="sm:grid-cols-3": Failure("lexing: empty token")
+error: input="sm:grid-cols-4": Failure("lexing: empty token")
+error: input="sm:grid-cols-5": Failure("lexing: empty token")
+@media (width>=640px){.sm\:h-52{height:13rem}}
+@media (width>=640px){.sm\:h-full{height:100%}}
+@media (width>=640px){.sm\:hidden{display:none}}
+@media (width>=640px){.sm\:inline{display:inline}}
+@media (width>=640px){.sm\:inset-0{inset:0}}
+@media (width>=640px){.sm\:items-center{align-items:center}}
+@media (width>=640px){.sm\:items-end{align-items:flex-end}}
+@media (width>=640px){.sm\:justify-center{justify-content:center}}
+error: input="sm:leading-6": Failure("lexing: empty token")
+error: input="sm:max-w-sm": Failure("lexing: empty token")
+@media (width>=640px){.sm\:mt-20{margin-top:5rem}}
+@media (width>=640px){.sm\:mt-5{margin-top:1.25rem}}
+@media (width>=640px){.sm\:mt-6{margin-top:1.5rem}}
+@media (width>=640px){.sm\:mx-4{margin-left:1rem;margin-right:1rem}}
+@media (width>=640px){.sm\:my-8{margin-top:2rem;margin-bottom:2rem}}
+@media (width>=640px){.sm\:p-0{padding:0}}
+@media (width>=640px){.sm\:p-6{padding:1.5rem}}
+@media (width>=640px){.sm\:p-8{padding:2rem}}
+@media (width>=640px){.sm\:pb-10{padding-bottom:2.5rem}}
+@media (width>=640px){.sm\:pb-12{padding-bottom:3rem}}
+@media (width>=640px){.sm\:pb-20{padding-bottom:5rem}}
+@media (width>=640px){.sm\:pb-8{padding-bottom:2rem}}
+@media (width>=640px){.sm\:pl-0{padding-left:0}}
+@media (width>=640px){.sm\:pl-3{padding-left:.75rem}}
+@media (width>=640px){.sm\:pl-6{padding-left:1.5rem}}
+@media (width>=640px){.sm\:pl-8{padding-left:2rem}}
+@media (width>=640px){.sm\:pr-3{padding-right:.75rem}}
+@media (width>=640px){.sm\:pt-0{padding-top:0}}
+@media (width>=640px){.sm\:pt-12{padding-top:3rem}}
+@media (width>=640px){.sm\:pt-16{padding-top:4rem}}
+@media (width>=640px){.sm\:pt-4{padding-top:1rem}}
+@media (width>=640px){.sm\:pt-48{padding-top:12rem}}
+@media (width>=640px){.sm\:px-12{padding-left:3rem;padding-right:3rem}}
+error: input="sm:rounded-3xl": Failure("lexing: empty token")
+@media (width>=640px){.sm\:text-2xl{font-size:1.5rem;line-height:2rem}}
+@media (width>=640px){.sm\:text-4xl{font-size:2.25rem;line-height:2.5rem}}
+@media (width>=640px){.sm\:text-5xl{font-size:3rem;line-height:1}}
+@media (width>=640px){.sm\:text-base{font-size:1rem;line-height:1.5rem}}
+@media (width>=640px){.sm\:text-sm{font-size:.875rem;line-height:1.25rem}}
+error: input="sm:transform-none": Failure("lexing: empty token")
+@media (width>=640px){.sm\:w-2\/3{width:66.6667%}}
+@media (width>=640px){.sm\:w-72{width:18rem}}
+@media (width>=640px){.sm\:w-full{width:100%}}
+error: input="space-x-8": Failure("lexing: empty token")
+error: input="space-y-2": Failure("lexing: empty token")
+error: input="space-y-4": Failure("lexing: empty token")
+error: input="space-y-8": Failure("lexing: empty token")
+error: input="sr-only": Failure("lexing: empty token")
+.sticky{position:sticky}
+.stroke-gray-200{stroke:oklch(0.928 0.006 264.531)}
+.text-3xl{font-size:1.875rem;line-height:2.25rem}
+.text-4xl{font-size:2.25rem;line-height:2.5rem}
+.text-5xl{font-size:3rem;line-height:1}
+.text-base{font-size:1rem;line-height:1.5rem}
+.text-black{color:#000}
+.text-blue-700{color:oklch(0.488 0.243 264.376)}
+.text-blue-900{color:oklch(0.379 0.146 265.522)}
+.text-blue-950{color:oklch(0.282 0.091 267.935)}
+error: input="text-center": Failure("lexing: empty token")
+error: input="text-ellipsis": Failure("lexing: empty token")
+.text-gray-300{color:oklch(0.872 0.01 258.338)}
+.text-gray-400{color:oklch(0.707 0.022 261.325)}
+.text-gray-500{color:oklch(0.551 0.027 264.364)}
+.text-gray-600{color:oklch(0.446 0.03 256.802)}
+.text-gray-700{color:oklch(0.373 0.034 259.733)}
+.text-gray-800{color:oklch(0.278 0.033 256.848)}
+.text-gray-900{color:oklch(0.21 0.034 264.665)}
+.text-green-600{color:oklch(0.627 0.194 149.214)}
+.text-green-700{color:oklch(0.527 0.154 150.069)}
+error: input="text-left": Failure("lexing: empty token")
+.text-lg{font-size:1.125rem;line-height:1.75rem}
+error: input="text-right": Failure("lexing: empty token")
+.text-sky-600{color:oklch(0.588 0.158 241.966)}
+.text-sky-700{color:oklch(0.5 0.134 242.749)}
+.text-sky-800{color:oklch(0.443 0.11 240.79)}
+.text-sky-900{color:oklch(0.391 0.09 240.876)}
+.text-slate-400{color:oklch(0.704 0.04 256.788)}
+.text-slate-500{color:oklch(0.554 0.046 257.417)}
+.text-sm{font-size:.875rem;line-height:1.25rem}
+error: input="text-sm/6": Failure("lexing: empty token")
+.text-teal-600{color:oklch(0.6 0.118 184.704)}
+.text-white{color:#fff}
+.text-xl{font-size:1.25rem;line-height:1.75rem}
+.text-xs{font-size:.75rem;line-height:1rem}
+error: input="text-xs/5": Failure("lexing: empty token")
+error: input="to-[#4f46e5]": Failure("lexing: empty token")
+error: input="to-blue-600": Failure("lexing: empty token")
+error: input="to-blue-800": Failure("lexing: empty token")
+error: input="to-gray-50": Failure("lexing: empty token")
+error: input="to-teal-600": Failure("lexing: empty token")
+error: input="to-transparent": Failure("lexing: empty token")
+.top-0{top:0}
+.top-1\/2{top:50%}
+.top-16{top:4rem}
+.top-4{top:1rem}
+.top-96{top:24rem}
+error: input="tracking-tight": Failure("lexing: empty token")
+error: input="transform": Failure("lexing: empty token")
+error: input="transform-gpu": Failure("lexing: empty token")
+error: input="transition-all": Failure("lexing: empty token")
+error: input="transition-opacity": Failure("lexing: empty token")
+error: input="uppercase": Failure("lexing: empty token")
+error: input="via-blue-950": Failure("lexing: empty token")
+error: input="via-gray-900/40": Failure("lexing: empty token")
+error: input="via-teal-500": Failure("lexing: empty token")
+error: input="via-white": Failure("lexing: empty token")
+.w-0{width:0}
+.w-0\.5{width:.125rem}
+.w-1{width:.25rem}
+.w-10{width:2.5rem}
+.w-12{width:3rem}
+.w-14{width:3.5rem}
+.w-20{width:5rem}
+.w-24{width:6rem}
+.w-36{width:9rem}
+.w-4{width:1rem}
+.w-5{width:1.25rem}
+.w-6{width:1.5rem}
+.w-8{width:2rem}
+.w-80{width:20rem}
+.w-\[68\.5625rem\]{width:68.5625rem}
+.w-\[69\.25rem\]{width:69.25rem}
+.w-\[82\.375rem\]{width:82.375rem}
+.w-auto{width:auto}
+.w-full{width:100%}
+.w-screen{width:100vw}
+error: input="whitespace-nowrap": Failure("lexing: empty token")
+@media (width>=1280px){.xl\:block{display:block}}
+@media (width>=1280px){.xl\:gap-x-20{column-gap:5rem}}
+@media (width>=1280px){.xl\:h-96{height:24rem}}
+error: input="xl:max-w-3xl": Failure("lexing: empty token")
+error: input="xl:max-w-7xl": Failure("lexing: empty token")
+@media (width>=1280px){.xl\:mx-auto{margin-left:auto;margin-right:auto}}
+@media (width>=1280px){.xl\:pb-10{padding-bottom:2.5rem}}
+@media (width>=1280px){.xl\:px-10{padding-left:2.5rem;padding-right:2.5rem}}
+@media (width>=1280px){.xl\:px-20{padding-left:5rem;padding-right:5rem}}
+@media (width>=1280px){.xl\:px-8{padding-left:2rem;padding-right:2rem}}
+error: input="xl:rounded-3xl": Failure("lexing: empty token")
+.z-0{z-index:0}
+.z-10{z-index:10}
+.z-50{z-index:50}

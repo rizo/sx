@@ -5,10 +5,24 @@
     "transition-duration": "150ms",
     "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)"
   },
+  "custom": {"regex": "[^\[\]\{\}@]+"},
   "font": {
     "sans": "ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
     "serif": "ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif",
     "mono": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"
+  },
+  "side": {
+    "x": ["left", "right"],
+    "t": "top"
+  },
+  "clear": ["left", "right", "none"],
+  "z": {
+    "0": "0",
+    "10": "10",
+    "20": "20",
+    "30": "30",
+    "40": "40",
+    "50": "50"
   },
   "color": {
     "red-50": "oklch(0.971 0.013 17.38)",
@@ -301,7 +315,22 @@
     "6xl": "72rem",
     "7xl": "80rem"
   },
-  "text-size": {
+  "text_size": {
+    "xs": { "size": "0.75rem", "line_height": "1.25" },
+    "sm": "0.875rem",
+    "base": "1rem",
+    "lg": "1.125rem",
+    "xl": "1.25rem",
+    "2xl": "1.5rem",
+    "3xl": "1.875rem",
+    "4xl": "2.25rem",
+    "5xl": "3rem",
+    "6xl": "3.75rem",
+    "7xl": "4.5rem",
+    "8xl": "6rem",
+    "9xl": "8rem"
+  },
+  "text_size": {
     "xs": "0.75rem",
     "sm": "0.875rem",
     "base": "1rem",

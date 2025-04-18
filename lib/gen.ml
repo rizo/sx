@@ -32,6 +32,18 @@ let dir x =
 
 let px x = Either.Left [ (if String.equal x "0" then "0" else x ^ "px") ]
 
+let len' (spacing, unit) key =
+  match key with
+  | "0" -> "0"
+  | "px" -> "1px"
+  | "auto" -> "auto"
+  | "full" -> "100%"
+  | n_str ->
+    let n = try float_of_string n_str with _ -> unknown_key key in
+    let m = spacing *. n in
+    let m_str = float_to_css_string m in
+    m_str ^ unit
+
 let len (spacing, unit) key =
   match key with
   | "0" -> Either.Left [ "0" ]

@@ -1,0 +1,13 @@
+(executable
+ (name main)
+ (modules main)
+ (libraries sedlex)
+ (preprocess
+  (pps sedlex.ppx)))
+
+(executable
+ (name main_dyn)
+ (modules main_dyn)
+ (libraries sedlex sedlex.ppx)
+ (preprocess
+  (pps sedlex.ppx)))

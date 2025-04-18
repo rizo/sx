@@ -1,5 +1,5 @@
 (executable
-  (public_name sx)
-  (name main)
-  (libraries sx fmt))
-
+ (public_name sx)
+ (package sx)
+ (name main)
+ (libraries sx fmt))
