@@ -1,3 +1,3 @@
 (executable
-  (name main)
-  (libraries re))
+ (name main)
+ (libraries re fmt))
