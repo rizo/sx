@@ -1,0 +1,3 @@
+(library
+ (public_name re_match)
+ (libraries re))
