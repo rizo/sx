@@ -43,7 +43,7 @@ let delimited expr =
 
 let case rule act = (delimited rule, act)
 
-let matcher =
+let cases =
   [
     case Rules.w_full (debug_action "w_full");
     case Rules.w_len (debug_action "w_len");
@@ -55,12 +55,12 @@ let matcher =
   |> Re_match.compile
 
 let () =
-  print "%a" Re.pp_re (Re_match.re matcher);
+  print "%a" Re.pp_re (Re_match.re cases);
   while true do
     print ~break:Fmt.flush "> ";
     match In_channel.input_line stdin with
     | None ->
       print_newline ();
       exit 0
-    | Some line -> Seq.iter ignore (Re_match.all r1 line)
+    | Some line -> Seq.iter ignore (Re_match.all cases line)
   done

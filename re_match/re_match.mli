@@ -1,3 +1,27 @@
+(** {1 Regular-expression case matching}
+
+    This module allows matching an input string based on a regular expression.
+    The provided functionality is similar to OCaml's [match] expression:
+
+    {[
+      let cases =
+        let re = Re.Posix.re in
+        [
+          (* Match a number *)
+          (re "[0-9]+", fun g -> "a number: " ^ Re.Group.get g 0);
+          (* Match something fixed *)
+          (re "fixed", fun g -> "just a fixed string");
+          (* Match an email *)
+          (re "[a-z0-9_.]+@[a-z0-9_-]+(.[a-z]+)*", fun g -> Re.Group.get g 0);
+        ]
+        |> Re_match.compile
+
+      let () =
+        match Re_match.exec cases "user@example.com" with
+        | None -> print_endline "No match"
+        | Some matched -> print_endline ("Match: " ^ matched)
+    ]} *)
+
 type 'a t
 (** The compiled state of the regular expression matcher.
 
