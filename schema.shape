@@ -53,10 +53,10 @@ bg = {
 };
 
 margin = {
-  (neg = "-"?) "m" (s = side) "-" (l = len) => {
+  (neg = "-"?) "m" (s = side) "-" (l = len0) => {
     "margin-" s: neg l
   },
-  (neg = "-"?) "m-" (l = len) => {
+  (neg = "-"?) "m-" (l = len0) => {
     "margin": neg l
   }
 };
@@ -75,7 +75,7 @@ width = {
   //"w-" (v = custom) => {
   //  "width": v
   //},
-  "w-" (n = len) => {
+  "w-" (n = len0) => {
     "width": n
   }
 //  "w-" (n = int) "/" (m = int) => {

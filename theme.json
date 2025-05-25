@@ -12,6 +12,7 @@
   },
   "side": {
     "x": ["left", "right"],
+    "y": ["top", "bottom"],
     "t": "top"
   },
   "clear": ["left", "right", "none"],

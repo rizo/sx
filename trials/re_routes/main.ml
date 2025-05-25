@@ -9,59 +9,69 @@ module Theme = struct
   type var_value = [ `flat of string list | `nested of string list assoc ]
 
   (* option -> var -> (flat: value list | nested: sub_var -> value list *)
-  type t = var_value String_map.t String_map.t
+  type t = [ `static of var_value String_map.t | `regex of Re.t ] String_map.t
+
+  let is_regex_var ~var_name t =
+    match String_map.find var_name t with
+    | `regex _ -> true
+    | `static _ -> false
+    | exception Not_found -> false
 
   let dump f t =
     String_map.iter
       (fun option vars ->
-        Fmt.pf f "%S:@." option;
-        String_map.iter (fun var _values -> Fmt.pf f "  - %S@." var) vars)
+        match vars with
+        | `regex regex -> Fmt.pf f "%S: %a@." option Re.pp regex
+        | `static vars ->
+          Fmt.pf f "%S:@." option;
+          String_map.iter (fun var _values -> Fmt.pf f "  - %S@." var) vars)
       t
 
   let read_option_vars json =
     match json with
     | `Assoc assoc ->
-      List.fold_left
-        (fun acc (var, var_value_json) ->
-          let var_values =
-            match var_value_json with
-            | `String value -> `flat [ value ]
-            | `Assoc sub_vars ->
-              `nested
-                (List.map
-                   (function
-                     | sub_var, `String value -> (sub_var, [ value ])
-                     | sub_var, `List values_json ->
-                       ( sub_var,
-                         List.map Yojson.Basic.Util.to_string values_json )
-                     | _ ->
-                       Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp var_value_json;
-                       Fmt.invalid_arg
-                         "theme: var=%S: sub var value must be a string or a \
-                          list of string"
-                         var)
-                   sub_vars)
-            | `List values_json ->
-              `flat (List.map Yojson.Basic.Util.to_string values_json)
-            | _ ->
-              Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp var_value_json;
-              Fmt.invalid_arg
-                "var=%S: theme value must be a string or a list of string" var
-          in
-          String_map.add var var_values acc)
-        String_map.empty assoc
+      let vars =
+        List.fold_left
+          (fun acc (var, var_value_json) ->
+            let var_values =
+              match var_value_json with
+              | `String value -> `flat [ value ]
+              | `Assoc sub_vars ->
+                `nested
+                  (List.map
+                     (function
+                       | sub_var, `String value -> (sub_var, [ value ])
+                       | sub_var, `List values_json ->
+                         ( sub_var,
+                           List.map Yojson.Basic.Util.to_string values_json )
+                       | _ ->
+                         Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp var_value_json;
+                         Fmt.invalid_arg
+                           "theme: var=%S: sub var value must be a string or a \
+                            list of string"
+                           var)
+                     sub_vars)
+              | `List values_json ->
+                `flat (List.map Yojson.Basic.Util.to_string values_json)
+              | _ ->
+                Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp var_value_json;
+                Fmt.invalid_arg
+                  "var=%S: theme value must be a string or a list of string" var
+            in
+            String_map.add var var_values acc)
+          String_map.empty assoc
+      in
+      `static vars
     | `List id_vars ->
-      List.fold_left
-        (fun acc id_var_json ->
-          let id_var = Yojson.Basic.Util.to_string id_var_json in
-          String_map.add id_var (`flat [ id_var ]) acc)
-        String_map.empty id_vars
-    (* | `String regex -> *)
-    (*   List.fold_left *)
-    (*     (fun acc id_var_json -> *)
-    (*       let id_var = Yojson.Basic.Util.to_string id_var_json in *)
-    (*       String_map.add id_var (`flat [ id_var ]) acc) *)
-    (*     String_map.empty id_vars *)
+      let vars =
+        List.fold_left
+          (fun acc id_var_json ->
+            let id_var = Yojson.Basic.Util.to_string id_var_json in
+            String_map.add id_var (`flat [ id_var ]) acc)
+          String_map.empty id_vars
+      in
+      `static vars
+    | `String regex -> `regex (Re.Posix.re ~opts:[] regex)
     | _ ->
       Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp json;
       invalid_arg "option value must be an object, a list or a regex string"
@@ -75,14 +85,24 @@ module Theme = struct
         String_map.add option vars acc)
       String_map.empty options_assoc
 
-  let var_names_for_option option (t : t) =
-    try
-      let vars = String_map.find option t in
-      String_map.to_seq vars |> Seq.map fst
-    with Not_found -> Fmt.failwith "theme: option not found: %S" option
+  let regex_for_option option (t : t) =
+    match String_map.find option t with
+    | exception Not_found -> Fmt.failwith "theme: option not found: %S" option
+    | `regex regex -> regex
+    | `static vars ->
+      let var_names = String_map.to_seq vars |> Seq.map fst in
+      Seq.map Re.str var_names |> List.of_seq |> Re.alt
 
   let lookup_flat_var ~option ~var_name (t : t) =
-    let vars = String_map.find option t in
+    let vars =
+      match String_map.find option t with
+      | exception Not_found -> Fmt.failwith "theme: option not found"
+      | `static vars -> vars
+      | `regex _ ->
+        Fmt.failwith
+          "theme: var_name=%S: found regex when static var was expected"
+          var_name
+    in
     try
       let values = String_map.find var_name vars in
       match values with
@@ -94,7 +114,15 @@ module Theme = struct
     with Not_found -> Fmt.invalid_arg "theme: var_name not found: %S" var_name
 
   let lookup_nested_var ~option ~var_name ~sub_var_name (t : t) =
-    let vars = String_map.find option t in
+    let vars =
+      match String_map.find option t with
+      | exception Not_found -> Fmt.failwith "theme: option not found"
+      | `static vars -> vars
+      | `regex _ ->
+        Fmt.failwith
+          "theme: var_name=%S: found regex when static var was expected"
+          var_name
+    in
     try
       let values = String_map.find var_name vars in
       match values with
@@ -163,9 +191,6 @@ module Schema_eval = struct
     Fmt.pr "INPUT: %a@." Shaper.Shape.pp_sexp syn;
     Fmt.failwith "%s: expected `%s`" name msg
 
-  let theme_var_names_to_re var_names =
-    Seq.map Re.str var_names |> List.of_seq |> Re.alt
-
   let get_matched_var_value ~slot g =
     try Re.Group.get g slot
     with Not_found ->
@@ -220,9 +245,7 @@ module Schema_eval = struct
     | `str str -> Re.str str
     | `char c -> Re.char c
     | `brackets (`infix ("-", `char c1, `char c2)) -> Re.rg c1 c2
-    | `id theme_option ->
-      let var_names = Theme.var_names_for_option theme_option theme in
-      theme_var_names_to_re var_names
+    | `id theme_option -> Theme.regex_for_option theme_option theme
     | `postfix ("?", syn') -> Re.opt (eval_pat_var_value ~theme syn')
     | `infix ("|", left_syn, right_syn) ->
       let left = eval_pat_var_value ~theme left_syn in
@@ -240,8 +263,11 @@ module Schema_eval = struct
     | `char c -> Re.char c
     | `parens (`infix ("=", `id var_name, var_value_syn)) ->
       let var_value_re = eval_pat_var_value ~theme var_value_syn in
+      (* WIP: Handle regex var, currently is saved as theme var and fails on lookup. *)
       let scope_var =
         match var_value_syn with
+        | `id option when Theme.is_regex_var ~var_name:option theme ->
+          Inline_var { slot = scope.var_count + 1; re = var_value_re }
         | `id option -> Theme_var { option; slot = scope.var_count + 1 }
         | _ -> Inline_var { slot = scope.var_count + 1; re = var_value_re }
       in
@@ -348,7 +374,7 @@ let () =
   Printexc.record_backtrace true;
   print_newline ();
   let theme = Theme.read "./theme.json" in
-  Fmt.pr "THEME:@.a%a@." Theme.dump theme;
+  Fmt.pr "THEME:@.%a@." Theme.dump theme;
   let schema_match = read_schema ~theme "./schema.shape" in
   (* print "%a" Re.pp_re (Re_match.re cases); *)
   while true do
