@@ -14,7 +14,7 @@ in onix.env {
   };
 
   deps = {
-    "ocaml-base-compiler" = "5.2.1";
+    "ocaml-base-compiler" = "*";
     "ocaml-lsp-server" = "*";
     "ocamlformat" = "*";
     "ocp-browser" = "*";

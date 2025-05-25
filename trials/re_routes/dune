@@ -1,3 +1,3 @@
 (executable
  (name main)
- (libraries re re_match fmt))
+ (libraries shaper re re_match fmt yojson))

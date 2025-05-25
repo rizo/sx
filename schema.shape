@@ -1,6 +1,11 @@
+test1 = {
+  "hello-" (a = "x") => {
+    "aspect-test": a
+  }
+};
 
 aspect = {
-  "aspect-" (a = theme.aspect) => {
+  "aspect-" (a = aspect) => {
     "aspect-ratio": a
   }
 };
@@ -16,62 +21,68 @@ columns = {
 
 bg = {
   "bg-" (c = color) => {
-    "background-color" = c
+    "background-color": c
   }
 };
 
 margin = {
-  (neg = "-"?) "m" (s = theme.side) "-" (l = theme.len) => {
-    "margin-" s = neg l
+  (neg = "-"?) "m" (s = side) "-" (l = len) => {
+    "margin-" s: neg l
   },
   (neg = "-"?) "m-" (l = len) => {
-    "margin" = neg l
+    "margin": neg l
   }
 };
 
 text = {
   "text-" (t = text_size) => {
-    "font-size" = t.size,
-    "line-height" = t.line_height
+    "font-size": t.size,
+    "line-height": t.line_height
   }
 };
 
 width = {
-  "w-" (v = custom) => {
-    "width" = v
+  "w-full" => {
+    "width": "100%"
   },
-  "w-" (n = int) "/" (m = int) => {
-    "width" = frac n m
+  //"w-" (v = custom) => {
+  //  "width": v
+  //},
+  "w-" (n = len) => {
+    "width": n
   }
+//  "w-" (n = int) "/" (m = int) => {
+//    "width": frac n m
+//  }
 };
 
 clear = {
   "clear-" (c = "start" | "end") => {
-    "clear" = "inline-" + c
+    "clear": "inline-" c
   },
   "clear-" (c = "left" | "right" | "none") => {
-    "clear" = c
+    "clear": c
   }
 };
 
 button = {
   "btn" => {
-    "border" = "1px solid red",
-    "background" = "blue"
+    "border": "1px solid red",
+    "background": "blue"
   },
 
   "btn" => {
     "border",
-    "bg-" + btn.primary
+    "bg-" btn.primary
   }
 };
 
 shadow = {
   "shadow-" (c = color) => {
-    "--sx-shadow-color" = c
+    "--sx-shadow-color": c
   },
   "shadow-" (s = size) => {
-    "box-shadow" = s
+    "box-shadow": s
   }
 };
 

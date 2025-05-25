@@ -1,11 +1,5 @@
 {
-  "default": {
-    "font-family": "sans",
-    "mono-font-family": "mono",
-    "transition-duration": "150ms",
-    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)"
-  },
-  "custom": {"regex": "[^\[\]\{\}@]+"},
+  "len": ["1", "2", "3", "42"],
   "font": {
     "sans": "ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
     "serif": "ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif",
@@ -292,7 +286,6 @@
     "black": "#000",
     "white": "#fff"
   },
-  "spacing": "0.25rem",
   "breakpoint": {
     "sm": "40rem",
     "md": "48rem",
@@ -316,7 +309,6 @@
     "7xl": "80rem"
   },
   "text_size": {
-    "xs": { "size": "0.75rem", "line_height": "1.25" },
     "sm": "0.875rem",
     "base": "1rem",
     "lg": "1.125rem",
