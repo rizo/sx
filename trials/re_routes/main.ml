@@ -6,10 +6,10 @@ module String_map = Map.Make (String)
 type 'a assoc = (string * 'a) list
 
 module Theme = struct
+  type var_value = [ `flat of string list | `nested of string list assoc ]
+
   (* option -> var -> (flat: value list | nested: sub_var -> value list *)
-  type t =
-    [ `flat of string list | `nested of string list assoc ] String_map.t
-    String_map.t
+  type t = var_value String_map.t String_map.t
 
   let dump f t =
     String_map.iter
@@ -56,9 +56,15 @@ module Theme = struct
           let id_var = Yojson.Basic.Util.to_string id_var_json in
           String_map.add id_var (`flat [ id_var ]) acc)
         String_map.empty id_vars
+    (* | `String regex -> *)
+    (*   List.fold_left *)
+    (*     (fun acc id_var_json -> *)
+    (*       let id_var = Yojson.Basic.Util.to_string id_var_json in *)
+    (*       String_map.add id_var (`flat [ id_var ]) acc) *)
+    (*     String_map.empty id_vars *)
     | _ ->
       Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp json;
-      invalid_arg "vars must be an object or a list"
+      invalid_arg "option value must be an object, a list or a regex string"
 
   let read path =
     let options_json = Yojson.Basic.from_file path in
