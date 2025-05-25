@@ -3,15 +3,19 @@ let print ?(break : unit Fmt.t = Format.pp_print_newline) fmt =
 
 module String_map = Map.Make (String)
 
+type 'a assoc = (string * 'a) list
+
 module Theme = struct
-  (* option -> var -> value list *)
-  type t = string list String_map.t String_map.t
+  (* option -> var -> (flat: value list | nested: sub_var -> value list *)
+  type t =
+    [ `flat of string list | `nested of string list assoc ] String_map.t
+    String_map.t
 
   let dump f t =
     String_map.iter
       (fun option vars ->
         Fmt.pf f "%S:@." option;
-        String_map.iter (fun var values -> Fmt.pf f "  - %S@." var) vars)
+        String_map.iter (fun var _values -> Fmt.pf f "  - %S@." var) vars)
       t
 
   let read_option_vars json =
@@ -21,12 +25,28 @@ module Theme = struct
         (fun acc (var, var_value_json) ->
           let var_values =
             match var_value_json with
-            | `String value -> [ value ]
+            | `String value -> `flat [ value ]
+            | `Assoc sub_vars ->
+              `nested
+                (List.map
+                   (function
+                     | sub_var, `String value -> (sub_var, [ value ])
+                     | sub_var, `List values_json ->
+                       ( sub_var,
+                         List.map Yojson.Basic.Util.to_string values_json )
+                     | _ ->
+                       Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp var_value_json;
+                       Fmt.invalid_arg
+                         "theme: var=%S: sub var value must be a string or a \
+                          list of string"
+                         var)
+                   sub_vars)
             | `List values_json ->
-              List.map Yojson.Basic.Util.to_string values_json
+              `flat (List.map Yojson.Basic.Util.to_string values_json)
             | _ ->
               Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp var_value_json;
-              invalid_arg "theme values must be string or list of string"
+              Fmt.invalid_arg
+                "var=%S: theme value must be a string or a list of string" var
           in
           String_map.add var var_values acc)
         String_map.empty assoc
@@ -34,7 +54,7 @@ module Theme = struct
       List.fold_left
         (fun acc id_var_json ->
           let id_var = Yojson.Basic.Util.to_string id_var_json in
-          String_map.add id_var [ id_var ] acc)
+          String_map.add id_var (`flat [ id_var ]) acc)
         String_map.empty id_vars
     | _ ->
       Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp json;
@@ -49,15 +69,41 @@ module Theme = struct
         String_map.add option vars acc)
       String_map.empty options_assoc
 
-  let var_names_for_option option t =
+  let var_names_for_option option (t : t) =
     try
       let vars = String_map.find option t in
       String_map.to_seq vars |> Seq.map fst
     with Not_found -> Fmt.failwith "theme: option not found: %S" option
 
-  let lookup_var ~option var_name t =
+  let lookup_flat_var ~option ~var_name (t : t) =
     let vars = String_map.find option t in
-    try String_map.find var_name vars
+    try
+      let values = String_map.find var_name vars in
+      match values with
+      | `flat flat -> flat
+      | `nested _ ->
+        Fmt.invalid_arg
+          "theme: lookup_flat_var: option=%S: var=%S: var is not flat" option
+          var_name
+    with Not_found -> Fmt.invalid_arg "theme: var_name not found: %S" var_name
+
+  let lookup_nested_var ~option ~var_name ~sub_var_name (t : t) =
+    let vars = String_map.find option t in
+    try
+      let values = String_map.find var_name vars in
+      match values with
+      | `nested nested -> (
+        match List.assoc_opt sub_var_name nested with
+        | Some sub_val -> sub_val
+        | None ->
+          Fmt.invalid_arg
+            "theme: lookup_nested_var: option=%S: var=%S: sub_var=%S: sub var \
+             is not defined"
+            option var_name sub_var_name)
+      | `flat _ ->
+        Fmt.invalid_arg
+          "theme: lookup_nested_var: option=%S: var=%S: var is not nested"
+          option var_name
     with Not_found -> Fmt.invalid_arg "theme: var_name not found: %S" var_name
 end
 
@@ -69,6 +115,7 @@ end
 module Re_utils = struct
   let delim = Re.set " \t\n\"'|"
 
+  (* FIXME: matches with juxt trailing non-match: "columns-123" matches "columns-12" *)
   let delimited expr =
     let open Re in
     seq [ alt [ bos; delim ]; expr ]
@@ -120,7 +167,7 @@ module Schema_eval = struct
         "get_matched_var_value: slot %d not found in %S, nb_groups=%d" slot
         (Re.Group.get g 0) (Re.Group.nb_groups g)
 
-  let rec resolve_prop_seg ~theme ~scope ~g (syn : syn) =
+  let resolve_prop_seg ~theme ~scope ~g (syn : syn) =
     match syn with
     | `str str_val -> [ str_val ]
     | `id scope_var_name -> (
@@ -128,13 +175,23 @@ module Schema_eval = struct
       match scope_var with
       | Theme_var v ->
         let matched_var_value = get_matched_var_value ~slot:v.slot g in
-        Theme.lookup_var ~option:v.option matched_var_value theme
+        Theme.lookup_flat_var ~option:v.option ~var_name:matched_var_value theme
       | Inline_var v ->
         let matched_var_value = Re.Group.get g v.slot in
         [ matched_var_value ])
-    | _ -> expected "property value" "string or id" syn
+    | `infix (".", `id scope_var_name, `id scope_sub_var_name) -> (
+      let scope_var = get_scope_var ~name:scope_var_name scope in
+      match scope_var with
+      | Theme_var v ->
+        let matched_var_value = get_matched_var_value ~slot:v.slot g in
+        Theme.lookup_nested_var ~option:v.option ~var_name:matched_var_value
+          ~sub_var_name:scope_sub_var_name theme
+      | Inline_var v ->
+        let matched_var_value = Re.Group.get g v.slot in
+        [ matched_var_value ])
+    | _ -> expected "prop_seg" "string or id" syn
 
-  let resolve_prop_full ~theme ~scope ~g prop_name_seq prop_value_seq =
+  let resolve_prop_seq ~theme ~scope ~g prop_name_seq prop_value_seq =
     let parts = prop_name_seq @ (`str ": " :: prop_value_seq) in
     let parts = cartesian_map (resolve_prop_seg ~theme ~scope ~g) parts in
     List.map (String.concat "") parts
@@ -143,13 +200,13 @@ module Schema_eval = struct
   let rec eval_prop ~theme ~scope ~g (syn : syn) =
     match syn with
     | `infix (":", `seq prop_name_seq, `seq prop_value_seq) ->
-      resolve_prop_full ~theme ~scope ~g prop_name_seq prop_value_seq
+      resolve_prop_seq ~theme ~scope ~g prop_name_seq prop_value_seq
     | `infix (":", `seq prop_name_seq, prop_value_syn) ->
-      resolve_prop_full ~theme ~scope ~g prop_name_seq [ prop_value_syn ]
+      resolve_prop_seq ~theme ~scope ~g prop_name_seq [ prop_value_syn ]
     | `infix (":", prop_name_syn, `seq prop_value_seq) ->
-      resolve_prop_full ~theme ~scope ~g [ prop_name_syn ] prop_value_seq
+      resolve_prop_seq ~theme ~scope ~g [ prop_name_syn ] prop_value_seq
     | `infix (":", prop_name_syn, prop_value_syn) ->
-      resolve_prop_full ~theme ~scope ~g [ prop_name_syn ] [ prop_value_syn ]
+      resolve_prop_seq ~theme ~scope ~g [ prop_name_syn ] [ prop_value_syn ]
     | _ -> expected "decl" "_ : _" syn
 
   let rec eval_pat_var_value ~theme (syn : syn) =
@@ -164,7 +221,7 @@ module Schema_eval = struct
     | `infix ("|", left_syn, right_syn) ->
       let left = eval_pat_var_value ~theme left_syn in
       let right = eval_pat_var_value ~theme right_syn in
-      Re.alt [ left; right ]
+      Re.longest (Re.alt [ left; right ])
     | `parens syn' -> eval_pat_var_value ~theme syn'
     | `seq seq -> Re.seq (List.map (eval_pat_var_value ~theme) seq)
     | _ ->
@@ -174,6 +231,7 @@ module Schema_eval = struct
   let eval_pat_seg ~theme scope (syn : syn) =
     match syn with
     | `str str -> Re.str str
+    | `char c -> Re.char c
     | `parens (`infix ("=", `id var_name, var_value_syn)) ->
       let var_value_re = eval_pat_var_value ~theme var_value_syn in
       let scope_var =
