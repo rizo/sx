@@ -1,0 +1,104 @@
+
+aspect = {
+  "aspect-" (a = aspect) => {
+    "aspect-ratio": a
+  }
+};
+
+columns = {
+  "columns-" (c = ['0'-'9'] | ('1' ('0' | '1' | '2') | "auto")) => {
+    "columns": c
+  },
+  "columns-" (s = container) => {
+    "columns": s
+  }
+};
+
+bg = {
+  "bg-" (c = color) => {
+    "background-color": c
+  }
+};
+
+block = {
+  (display =
+    | "block"
+    | "inline-block"
+    | "inline"
+    | "flex"
+    | "inline-flex"
+    | "table"
+    | "inline-table"
+    | "table-caption"
+    | "table-cell"
+    | "table-column"
+    | "table-column-group"
+    | "table-footer-group"
+    | "table-header-group"
+    | "table-row-group"
+    | "table-row"
+    | "flow-root"
+    | "grid"
+    | "inline-grid"
+    | "contents"
+    | "list-item"
+  ) => {
+    "display": display
+  },
+  "hidden" => {
+    "display": "none"
+  }
+};
+
+box_sizing = {
+  "box-" (v = "border" | "content") => {
+    "box-sizing": "${v}-box"
+  }
+};
+
+margin = {
+  (minus = "-"?) "m" (s = side) "-" (l = int) => {
+    "margin-${s}": "calc(var(--spacing) * ${minus}${l})"
+  },
+  (minus = "-"?) "m-" (l = int) => {
+    "margin": "calc(var(--spacing) * ${minus}${l})"
+  }
+};
+
+text = {
+  "text-" (t = text_size) => {
+    "font-size": t.size,
+    "line-height": t.line_height
+  }
+};
+
+width = {
+  "w-full" => {
+    "width": "100%"
+  },
+  "w-" (n = int) => {
+    "width": "calc(var(--spacing) * ${n})"
+  },
+  "w-" (n = int) "/" (m = int) => {
+    "width": "calc(${n}/${m} * 100%)"
+  },
+};
+
+clear = {
+  "clear-" (c = "start" | "end") => {
+    "clear": "inline-${c}"
+  },
+  "clear-" (c = clear) => {
+    "clear": c
+  }
+};
+
+// shadow = {
+//   "shadow-" (c = color) => {
+//     "--sx-shadow-color": c
+//   },
+//   "shadow-" (s = size) => {
+//     "box-shadow": s
+//   }
+// };
+

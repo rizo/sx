@@ -1,0 +1,3 @@
+(library
+ (name sx)
+ (libraries flx re re_match fmt yojson))

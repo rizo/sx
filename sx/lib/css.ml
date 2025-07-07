@@ -85,7 +85,8 @@ let make_selector_name ~scope ~variants ~utility =
     String.iter
       (fun x ->
         if Char_set.mem x chars_that_need_escaping then Buffer.add_char buf '\\';
-        Buffer.add_char buf x)
+        Buffer.add_char buf x
+      )
       utility;
     Buffer.contents buf
   in
@@ -95,7 +96,8 @@ let make_selector_name ~scope ~variants ~utility =
   | _ ->
     let selector_prefix =
       Option.fold scope ~none:variants ~some:(fun scope ->
-          string_of_scope scope :: variants)
+          string_of_scope scope :: variants
+      )
     in
     let name = String.concat "\\:" selector_prefix ^ "\\:" ^ utility in
     name ^ ":" ^ String.concat ":" variants

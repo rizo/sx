@@ -1,9 +1,37 @@
-let print ?(break : unit Fmt.t = Format.pp_print_newline) fmt =
-  Format.kfprintf (fun f -> break f ()) Format.std_formatter fmt
+open struct
+  module String_map = Map.Make (String)
 
-module String_map = Map.Make (String)
+  type 'a assoc = (string * 'a) list
+end
 
-type 'a assoc = (string * 'a) list
+open Prelude
+
+module Utils = struct
+  let float_to_css_string n =
+    if Float.is_integer n then string_of_int (Float.to_int n)
+    else
+      let s = Printf.sprintf "%.6g" n in
+      if String.starts_with ~prefix:"0." s then
+        String.sub s 1 (String.length s - 1)
+      else s
+end
+
+open struct
+  type syn = Flx__Expr.t
+end
+
+type schema_error = { ctx : string; expected : string; actual : syn }
+
+let pp_schema_error f err =
+  Fmt.pf f "%s: expected %s;@,actual=%a" err.ctx err.expected Flx.pp err.actual
+
+exception Schema_error of schema_error
+
+let pp_schema_error f err =
+  Fmt.pf f "%s: expected %s;@,actual=%a" err.ctx err.expected Flx.pp err.actual
+
+exception Undefined_scope_var of string
+exception Undefined_theme_opt of string
 
 module Theme = struct
   type var_value = [ `flat of string list | `nested of string list assoc ]
@@ -24,7 +52,8 @@ module Theme = struct
         | `regex regex -> Fmt.pf f "%S: %a@." option Re.pp regex
         | `static vars ->
           Fmt.pf f "%S:@." option;
-          String_map.iter (fun var _values -> Fmt.pf f "  - %S@." var) vars)
+          String_map.iter (fun var _values -> Fmt.pf f "  - %S@." var) vars
+      )
       t
 
   let read_option_vars json =
@@ -43,14 +72,17 @@ module Theme = struct
                        | sub_var, `String value -> (sub_var, [ value ])
                        | sub_var, `List values_json ->
                          ( sub_var,
-                           List.map Yojson.Basic.Util.to_string values_json )
+                           List.map Yojson.Basic.Util.to_string values_json
+                         )
                        | _ ->
                          Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp var_value_json;
                          Fmt.invalid_arg
                            "theme: var=%S: sub var value must be a string or a \
                             list of string"
-                           var)
-                     sub_vars)
+                           var
+                       )
+                     sub_vars
+                  )
               | `List values_json ->
                 `flat (List.map Yojson.Basic.Util.to_string values_json)
               | _ ->
@@ -58,7 +90,8 @@ module Theme = struct
                 Fmt.invalid_arg
                   "var=%S: theme value must be a string or a list of string" var
             in
-            String_map.add var var_values acc)
+            String_map.add var var_values acc
+          )
           String_map.empty assoc
       in
       `static vars
@@ -67,7 +100,8 @@ module Theme = struct
         List.fold_left
           (fun acc id_var_json ->
             let id_var = Yojson.Basic.Util.to_string id_var_json in
-            String_map.add id_var (`flat [ id_var ]) acc)
+            String_map.add id_var (`flat [ id_var ]) acc
+          )
           String_map.empty id_vars
       in
       `static vars
@@ -82,12 +116,13 @@ module Theme = struct
     List.fold_left
       (fun acc (option, vars_json) ->
         let vars = read_option_vars vars_json in
-        String_map.add option vars acc)
+        String_map.add option vars acc
+      )
       String_map.empty options_assoc
 
   let regex_for_option option (t : t) =
     match String_map.find option t with
-    | exception Not_found -> Fmt.failwith "theme: option not found: %S" option
+    | exception Not_found -> raise (Undefined_theme_opt option)
     | `regex regex -> regex
     | `static vars ->
       let var_names = String_map.to_seq vars |> Seq.map fst in
@@ -96,7 +131,7 @@ module Theme = struct
   let lookup_flat_var ~option ~var_name (t : t) =
     let vars =
       match String_map.find option t with
-      | exception Not_found -> Fmt.failwith "theme: option not found"
+      | exception Not_found -> raise (Undefined_theme_opt option)
       | `static vars -> vars
       | `regex _ ->
         Fmt.failwith
@@ -133,7 +168,8 @@ module Theme = struct
           Fmt.invalid_arg
             "theme: lookup_nested_var: option=%S: var=%S: sub_var=%S: sub var \
              is not defined"
-            option var_name sub_var_name)
+            option var_name sub_var_name
+      )
       | `flat _ ->
         Fmt.invalid_arg
           "theme: lookup_nested_var: option=%S: var=%S: var is not nested"
@@ -141,35 +177,81 @@ module Theme = struct
     with Not_found -> Fmt.invalid_arg "theme: var_name not found: %S" var_name
 end
 
-module Css_gen = struct
-  let prop name value = String.concat ": " [ name; value ]
-  let block items = String.concat ";\n" items
-end
-
 module Re_utils = struct
-  let delim = Re.set " \t\n\"'|"
+  let delim_str = " \t\n\"'|`"
+  let delim = Re.set delim_str
 
   (* FIXME: matches with juxt trailing non-match: "columns-123" matches "columns-12" *)
   let delimited expr =
     let open Re in
-    seq [ alt [ bos; delim ]; expr ]
+    seq [ alt [ delim; start ]; expr; alt [ delim; stop ] ]
 end
 
+module Css_gen = struct
+  let chars_that_need_escaping =
+    Char_set.of_list [ ':'; '['; ']'; '('; ')'; '&'; '.'; '/' ]
+
+  let string_of_scope scope =
+    match scope with
+    | `sm -> "sm"
+    | `md -> "md"
+    | `lg -> "lg"
+    | `xl -> "xl"
+    | `xl2 -> "2xl"
+
+  let make_selector_name ~scope ~variants ~utility =
+    let utility =
+      let buf = Buffer.create (String.length utility + 4) in
+      String.iter
+        (fun x ->
+          let is_delim = String.contains Re_utils.delim_str x in
+          if not is_delim then (
+            if Char_set.mem x chars_that_need_escaping then
+              Buffer.add_char buf '\\';
+            Buffer.add_char buf x
+          )
+        )
+        utility;
+      Buffer.contents buf
+    in
+    match (scope, variants) with
+    | None, [] -> utility
+    | Some scope, [] -> string_of_scope scope ^ "\\:" ^ utility
+    | _ ->
+      let selector_prefix =
+        Option.fold scope ~none:variants ~some:(fun scope ->
+            string_of_scope scope :: variants
+        )
+      in
+      let name = String.concat "\\:" selector_prefix ^ "\\:" ^ utility in
+      name ^ ":" ^ String.concat ":" variants
+end
+
+type rule = { selector : string; decl_block : string list }
+
+let pp_rule f rule =
+  Fmt.pf f "@[<v2>%s {@,%a@]@,}" rule.selector
+    (Fmt.list ~sep:Fmt.semi Fmt.string)
+    rule.decl_block
+
 module Schema_eval = struct
-  open struct
-    type syn = Shaper.Shape.t
-  end
+  let expected ctx expected actual =
+    raise (Schema_error { ctx; expected; actual })
 
   type scope_var =
     | Theme_var of { slot : int; option : string }
     | Inline_var of { slot : int; re : Re.t }
+
+  let pp_scope_var f = function
+    | Theme_var x -> Fmt.pf f "(theme_var %d %s)" x.slot x.option
+    | Inline_var x -> Fmt.pf f "(theme_var %d %a)" x.slot Re.pp x.re
 
   type scope = {
     mutable vars : scope_var String_map.t;
     mutable var_count : int;
   }
 
-  let ( let* ) props gen_prop = List.concat_map gen_prop props
+  let ( let* ) decls gen_decl = List.concat_map gen_decl decls
 
   let rec cartesian_map f l =
     match l with
@@ -185,11 +267,10 @@ module Schema_eval = struct
     scope.var_count <- scope.var_count + 1
 
   let new_scope () = { vars = String_map.empty; var_count = 0 }
-  let get_scope_var ~name scope = String_map.find name scope.vars
 
-  let expected name msg syn =
-    Fmt.pr "INPUT: %a@." Shaper.Shape.pp_sexp syn;
-    Fmt.failwith "%s: expected `%s`" name msg
+  let get_scope_var ~name scope =
+    try String_map.find name scope.vars
+    with Not_found -> raise (Undefined_scope_var name)
 
   let get_matched_var_value ~slot g =
     try Re.Group.get g slot
@@ -198,46 +279,54 @@ module Schema_eval = struct
         "get_matched_var_value: slot %d not found in %S, nb_groups=%d" slot
         (Re.Group.get g 0) (Re.Group.nb_groups g)
 
-  let resolve_prop_seg ~theme ~scope ~g (syn : syn) =
+  let resolve_decl_seg ~theme ~scope (syn : syn) =
     match syn with
-    | `str str_val -> [ str_val ]
+    | `str str_val -> fun ~g:_ -> [ str_val ]
     | `id scope_var_name -> (
       let scope_var = get_scope_var ~name:scope_var_name scope in
-      match scope_var with
-      | Theme_var v ->
-        let matched_var_value = get_matched_var_value ~slot:v.slot g in
-        Theme.lookup_flat_var ~option:v.option ~var_name:matched_var_value theme
-      | Inline_var v ->
-        let matched_var_value = Re.Group.get g v.slot in
-        [ matched_var_value ])
-    | `infix (".", `id scope_var_name, `id scope_sub_var_name) -> (
+      fun ~g ->
+        match scope_var with
+        | Theme_var v ->
+          let matched_var_value = get_matched_var_value ~slot:v.slot g in
+          Theme.lookup_flat_var ~option:v.option ~var_name:matched_var_value
+            theme
+        | Inline_var v ->
+          let matched_var_value = Re.Group.get g v.slot in
+          [ matched_var_value ]
+    )
+    | `dot [ `id scope_var_name; `id scope_sub_var_name ] -> (
       let scope_var = get_scope_var ~name:scope_var_name scope in
-      match scope_var with
-      | Theme_var v ->
-        let matched_var_value = get_matched_var_value ~slot:v.slot g in
-        Theme.lookup_nested_var ~option:v.option ~var_name:matched_var_value
-          ~sub_var_name:scope_sub_var_name theme
-      | Inline_var v ->
-        let matched_var_value = Re.Group.get g v.slot in
-        [ matched_var_value ])
-    | _ -> expected "prop_seg" "string or id" syn
+      fun ~g ->
+        match scope_var with
+        | Theme_var v ->
+          let matched_var_value = get_matched_var_value ~slot:v.slot g in
+          Theme.lookup_nested_var ~option:v.option ~var_name:matched_var_value
+            ~sub_var_name:scope_sub_var_name theme
+        | Inline_var v ->
+          let matched_var_value = Re.Group.get g v.slot in
+          [ matched_var_value ]
+    )
+    | _ -> expected "decl_seg" "string, id or variable" syn
 
-  let resolve_prop_seq ~theme ~scope ~g prop_name_seq prop_value_seq =
-    let parts = prop_name_seq @ (`str ": " :: prop_value_seq) in
-    let parts = cartesian_map (resolve_prop_seg ~theme ~scope ~g) parts in
-    List.map (String.concat "") parts
+  let resolve_decl_tpl ~theme ~scope decl_name_seq decl_value_seq =
+    let parts = decl_name_seq @ (`str ": " :: decl_value_seq) in
+    let decl_seg_delayed = List.map (resolve_decl_seg ~theme ~scope) parts in
+    fun ~g ->
+      decl_seg_delayed
+      |> cartesian_map (fun delayed -> delayed ~g)
+      |> List.map (String.concat "")
 
-  (* Eval CSS properties/declarations by expanding all variable combinations. *)
-  let rec eval_prop ~theme ~scope ~g (syn : syn) =
+  (* Eval CSS declarations by expanding all variable combinations. *)
+  let eval_decl ~theme ~scope (syn : syn) =
     match syn with
-    | `infix (":", `seq prop_name_seq, `seq prop_value_seq) ->
-      resolve_prop_seq ~theme ~scope ~g prop_name_seq prop_value_seq
-    | `infix (":", `seq prop_name_seq, prop_value_syn) ->
-      resolve_prop_seq ~theme ~scope ~g prop_name_seq [ prop_value_syn ]
-    | `infix (":", prop_name_syn, `seq prop_value_seq) ->
-      resolve_prop_seq ~theme ~scope ~g [ prop_name_syn ] prop_value_seq
-    | `infix (":", prop_name_syn, prop_value_syn) ->
-      resolve_prop_seq ~theme ~scope ~g [ prop_name_syn ] [ prop_value_syn ]
+    | `infix (":", `template decl_name_seq, `template decl_value_seq) ->
+      resolve_decl_tpl ~theme ~scope decl_name_seq decl_value_seq
+    | `infix (":", `template decl_name_seq, decl_value_syn) ->
+      resolve_decl_tpl ~theme ~scope decl_name_seq [ decl_value_syn ]
+    | `infix (":", decl_name_syn, `template decl_value_seq) ->
+      resolve_decl_tpl ~theme ~scope [ decl_name_syn ] decl_value_seq
+    | `infix (":", decl_name_syn, decl_value_syn) ->
+      resolve_decl_tpl ~theme ~scope [ decl_name_syn ] [ decl_value_syn ]
     | _ -> expected "decl" "_ : _" syn
 
   let rec eval_pat_var_value ~theme (syn : syn) =
@@ -247,14 +336,13 @@ module Schema_eval = struct
     | `brackets (`infix ("-", `char c1, `char c2)) -> Re.rg c1 c2
     | `id theme_option -> Theme.regex_for_option theme_option theme
     | `postfix ("?", syn') -> Re.opt (eval_pat_var_value ~theme syn')
-    | `infix ("|", left_syn, right_syn) ->
-      let left = eval_pat_var_value ~theme left_syn in
-      let right = eval_pat_var_value ~theme right_syn in
-      Re.longest (Re.alt [ left; right ])
+    | `pipe items ->
+      let items_re = List.map (eval_pat_var_value ~theme) items in
+      Re.longest (Re.alt items_re)
     | `parens syn' -> eval_pat_var_value ~theme syn'
     | `seq seq -> Re.seq (List.map (eval_pat_var_value ~theme) seq)
     | _ ->
-      Fmt.pr "INPUT:@.%a@." Shaper.Shape.pp_sexp syn;
+      Fmt.pr "INPUT:@.%a@." Flx.pp syn;
       failwith "eval_pat_var_value: expected `\"...\"` or `_ | _`"
 
   let eval_pat_seg ~theme scope (syn : syn) =
@@ -274,7 +362,7 @@ module Schema_eval = struct
       add_scope_var ~name:var_name scope_var scope;
       Re.group ~name:var_name var_value_re
     | _ ->
-      Fmt.pr "INPUT:@.%a@." Shaper.Shape.pp syn;
+      Fmt.pr "INPUT:@.%a@." Flx.pp syn;
       failwith "eval_pat_seg: expected `\"...\"` or `_ | _`"
 
   let eval_pat ~theme scope (syn : syn) =
@@ -284,22 +372,24 @@ module Schema_eval = struct
 
   let eval_case ~theme (syn : syn) =
     let scope = new_scope () in
-    match syn with
-    | `infix ("=>", pat, `braces (`comma decl_block_syn)) ->
-      let case_re = Re_utils.delimited (eval_pat ~theme scope pat) in
-      let resolve_block g =
-        let prop_list = List.map (eval_prop ~theme ~scope ~g) decl_block_syn in
-        Css_gen.block (List.concat prop_list)
+    let pat, decl_syn_list =
+      match syn with
+      | `infix ("=>", pat, `braces (`comma decl_syn_list)) ->
+        (pat, decl_syn_list)
+      | `infix ("=>", pat, `braces decl_syn) -> (pat, [ decl_syn ])
+      | _ -> failwith "expected `_ => { _ }` or `_ => { _, _ }"
+    in
+    let case_re = Re_utils.delimited (eval_pat ~theme scope pat) in
+    let decl_list_delayed = List.map (eval_decl ~theme ~scope) decl_syn_list in
+    let resolve_block g =
+      let selector =
+        Css_gen.make_selector_name ~scope:None ~variants:[]
+          ~utility:(Re.Group.get g 0)
       in
-      (case_re, resolve_block)
-    | `infix ("=>", pat, `braces decl_syn) ->
-      let case_re = Re_utils.delimited (eval_pat ~theme scope pat) in
-      let resolve_block g =
-        let prop_list = eval_prop ~theme ~scope ~g decl_syn in
-        Css_gen.block prop_list
-      in
-      (case_re, resolve_block)
-    | _ -> failwith "expected `_ => { _ }` or _ => { _, _ }"
+      let decl_block = List.concat_map (fun run -> run ~g) decl_list_delayed in
+      { selector; decl_block }
+    in
+    (case_re, resolve_block)
 
   let eval_group ~theme (syn : syn) =
     match syn with
@@ -307,81 +397,27 @@ module Schema_eval = struct
       List.map (eval_case ~theme) cases
     | `infix ("=", `id _group_name, `braces case) -> [ eval_case ~theme case ]
     | _ ->
-      Fmt.pr "INPUT:@.%a@." Shaper.Shape.pp syn;
+      Fmt.pr "INPUT:@.%a@." Flx.pp syn;
       failwith "expected `group_name = { _, _ }`"
 
   let eval ~theme (syn : syn) =
     match syn with
-    | `semi groups ->
-      let groups = List.concat_map (eval_group ~theme) groups in
-      groups
-    | _ -> failwith "expected `_; _`"
+    | `semi groups -> List.concat_map (eval_group ~theme) groups
+    | _ -> eval_group ~theme syn
 end
 
-module Theme' = struct
-  open Re
-
-  let len = rep1 digit
-  let size = alt [ str "xs"; str "sm"; str "md"; str "lg"; str "xl" ]
-  let side = alt [ str "t"; str "b"; str "l"; str "r"; str "x"; str "y" ]
-end
-
-module Rules = struct
-  open Re
-
-  let w_full_pat = seq [ str "w-full" ]
-  let w_full_css g = ()
-  let w_len = seq [ str "w-"; group Theme'.len ]
-  let w_frac = seq [ str "w-"; group Theme'.len; str "/"; group Theme'.len ]
-
-  let m_side_len =
-    seq
-      [
-        group (opt (str "-"));
-        str "m";
-        group Theme'.side;
-        str "-";
-        group Theme'.len;
-      ]
-
-  let m_len = seq [ group (opt (str "-")); str "m-"; group Theme'.len ]
-  let text_size = seq [ str "text-"; group Theme'.size ]
-end
-
-let debug_action name =
- fun g ->
-  Fmt.str "%s(%d): %s" name (Re.Group.nb_groups g)
-    (Re.Group.all g |> Array.to_list |> String.concat ", ")
-
-let cases =
-  let case rule act = (Re_utils.delimited rule, act) in
-  [
-    case Rules.w_full_pat (debug_action "w_full");
-    case Rules.w_len (debug_action "w_len");
-    case Rules.w_frac (debug_action "w_frac");
-    case Rules.m_side_len (debug_action "m_side_len");
-    case Rules.m_len (debug_action "m_len");
-    case Rules.text_size (debug_action "text_size");
-  ]
-  |> Re_match.compile
+let read_theme path = Theme.read path
 
 let read_schema ~theme path =
-  let syn = In_channel.with_open_text path Shaper.parse_channel in
+  let syn =
+    In_channel.with_open_text path (fun chan ->
+        Flx.parse (Flx.Lex.read_channel chan)
+    )
+  in
   let cases = Schema_eval.eval ~theme syn in
   Re_match.compile cases
 
-let () =
-  Printexc.record_backtrace true;
-  print_newline ();
-  let theme = Theme.read "./theme.json" in
-  Fmt.pr "THEME:@.%a@." Theme.dump theme;
-  let schema_match = read_schema ~theme "./schema.shape" in
-  (* print "%a" Re.pp_re (Re_match.re cases); *)
-  while true do
-    print ~break:Fmt.flush "> ";
-    match In_channel.input_line stdin with
-    | None ->
-      print_newline ();
-      exit 0
-    | Some line -> Seq.iter print_endline (Re_match.all schema_match line)
-  done
+type theme = Theme.t
+type schema = rule Re_match.t
+
+let process input schema = Re_match.all schema input

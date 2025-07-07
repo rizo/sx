@@ -8,15 +8,14 @@ in onix.env {
   path = ./.;
 
   vars = {
-    "with-test" = true;
-    "with-doc" = true;
-    "with-dev-setup" = true;
+    "with-test" = false;
+    "with-doc" = false;
+    "with-dev-setup" = false;
   };
 
   deps = {
-    "ocaml-base-compiler" = "*";
+    "ocaml-base-compiler" = "5.3.0";
     "ocaml-lsp-server" = "*";
     "ocamlformat" = "*";
-    "ocp-browser" = "*";
   };
 }

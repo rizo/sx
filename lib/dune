@@ -1,5 +1,0 @@
-(ocamllex lex)
-
-(library
- (name sx)
- (libraries fmt yojson shaper))

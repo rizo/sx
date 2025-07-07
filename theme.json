@@ -1,6 +1,5 @@
 {
-  "len0": "[0-9]+",
-  "len1": "[1-9][0-9]*",
+  "int": "[0-9]+",
   "font": {
     "sans": "ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
     "serif": "ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif",
@@ -13,9 +12,10 @@
   "side": {
     "x": ["left", "right"],
     "y": ["top", "bottom"],
-    "t": "top"
+    "t": "top",
+    "b": "bottom"
   },
-  "clear": ["left", "right", "none"],
+  "clear": ["left", "right", "none", "ricardo"],
   "z": {
     "0": "0",
     "10": "10",
@@ -31,7 +31,7 @@
     "xl": "80rem",
     "2xl": "96rem"
   },
-  "size": {
+  "container": {
     "3xs": "16rem",
     "2xs": "18rem",
     "xs": "20rem",

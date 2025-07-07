@@ -7,9 +7,9 @@ depends: [
   "fmt"
   "yojson" # theme/config
   "tyre" # regex routes!
-  "shaper"
+  "flx"
   "lambdasoup" {with-dev-setup}
 ]
 pin-depends: [
-  ["shaper.dev" "git+https://github.com/rizo/shaper#5a586808b01493fdc4ff5c9ca9c30b8ad695df1a"]
+  ["flx.dev" "git+https://github.com/rizo/shaper#2a50c021077fe16411961618a3e57e9905ca381f"]
 ]

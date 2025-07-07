@@ -11,3 +11,7 @@
   certain inputs will trigger the checks.
 - [ ] Handle !important.
 - [ ] Handle custom values.
+- [ ] Test more complex regexes.
+- [ ] Separate theme into "options" and "variables".
+    - "side" is an option.
+    - "spacing" is a variable.
