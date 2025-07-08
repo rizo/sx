@@ -15,3 +15,5 @@
 - [ ] Separate theme into "options" and "variables".
     - "side" is an option.
     - "spacing" is a variable.
+- [ ] `dark:md:sm:mt-1`
+- [ ]  Decide how spacing should be handled: var(--spacing) or static?

@@ -1,21 +1,21 @@
 
 aspect = {
-  "aspect-" (a = aspect) => {
-    "aspect-ratio": a
+  "aspect-${v = aspect}" => {
+    "aspect-ratio": v
   }
 };
 
 columns = {
-  "columns-" (c = ['0'-'9'] | ('1' ('0' | '1' | '2') | "auto")) => {
-    "columns": c
+  "columns-${v = ['0'-'9'] | ('1' ('0' | '1' | '2') | "auto")}" => {
+    "columns": v
   },
-  "columns-" (s = container) => {
-    "columns": s
+  "columns-${v = container}" => {
+    "columns": v
   }
 };
 
 bg = {
-  "bg-" (c = color) => {
+  "bg-${c = color}" => {
     "background-color": c
   }
 };
@@ -51,24 +51,57 @@ block = {
 };
 
 box_sizing = {
-  "box-" (v = "border" | "content") => {
+  "box-${v = "border" | "content"}" => {
     "box-sizing": "${v}-box"
   }
 };
 
 margin = {
-  (minus = "-"?) "m" (s = side) "-" (l = int) => {
+  "${minus = "-"?}m${s = side}-${l = int}" => {
     "margin-${s}": "calc(var(--spacing) * ${minus}${l})"
   },
-  (minus = "-"?) "m-" (l = int) => {
+  "${minus = "-"?}m-${l = int}" => {
     "margin": "calc(var(--spacing) * ${minus}${l})"
   }
 };
 
+font = {
+  "font-${f = font}" => {
+    "font-family": f
+  }
+};
+
+// https://tailwindcss.com/docs/font-style
+font_style = {
+  "italic" => {
+    "font-style": "italic",
+  },
+  "not-italic" => {
+    "font-style": "normal",
+  },
+};
+
+// https://tailwindcss.com/docs/font-weight
+font_weight = {
+  "font-${w = font_weight}" => {
+    "font-weight": w,
+  },
+};
+
 text = {
-  "text-" (t = text_size) => {
+  "text-${t = text_size}" => {
     "font-size": t.size,
     "line-height": t.line_height
+  }
+};
+
+// TODO: https://tailwindcss.com/docs/border-radius
+rounded = {
+  "rounded-${r = radius}" => {
+    "border-radius": r
+  },
+  "rounded-none" => {
+    "border-radius": "0"
   }
 };
 
@@ -76,29 +109,39 @@ width = {
   "w-full" => {
     "width": "100%"
   },
-  "w-" (n = int) => {
+  "w-${n = int}" => {
     "width": "calc(var(--spacing) * ${n})"
   },
-  "w-" (n = int) "/" (m = int) => {
+  "w-${n = int}/${m = int}" => {
     "width": "calc(${n}/${m} * 100%)"
   },
 };
 
 clear = {
-  "clear-" (c = "start" | "end") => {
+  "clear-${c = "start" | "end"}" => {
     "clear": "inline-${c}"
   },
-  "clear-" (c = clear) => {
+  "clear-${c = clear}" => {
     "clear": c
   }
 };
 
-// shadow = {
-//   "shadow-" (c = color) => {
-//     "--sx-shadow-color": c
-//   },
-//   "shadow-" (s = size) => {
-//     "box-shadow": s
-//   }
-// };
+blur = {
+  "blur-${v = blur}" => {
+    "filter": "blur(${v})"
+  },
+  "blur-none" => {
+    "filter": ""
+  }
+};
+
+// https://tailwindcss.com/docs/box-shadow
+box_shadow = {
+  "shadow-${c = color}" => {
+    "--sx-shadow-color": c
+  },
+  "shadow-${v = shadow}" => {
+    "box-shadow": v
+  }
+};
 

@@ -1,205 +1,106 @@
-open struct
-  module String_map = Map.Make (String)
-
-  type 'a assoc = (string * 'a) list
-end
+type flx = Flx__Expr.t
 
 open Prelude
 
-module Utils = struct
-  let float_to_css_string n =
-    if Float.is_integer n then string_of_int (Float.to_int n)
-    else
-      let s = Printf.sprintf "%.6g" n in
-      if String.starts_with ~prefix:"0." s then
-        String.sub s 1 (String.length s - 1)
-      else s
-end
-
-open struct
-  type syn = Flx__Expr.t
-end
-
-type schema_error = { ctx : string; expected : string; actual : syn }
+type schema_error = { ctx : string; expected : string; actual : flx }
 
 let pp_schema_error f err =
   Fmt.pf f "%s: expected %s;@,actual=%a" err.ctx err.expected Flx.pp err.actual
 
 exception Schema_error of schema_error
 
-let pp_schema_error f err =
-  Fmt.pf f "%s: expected %s;@,actual=%a" err.ctx err.expected Flx.pp err.actual
-
-exception Undefined_scope_var of string
-exception Undefined_theme_opt of string
-
-module Theme = struct
-  type var_value = [ `flat of string list | `nested of string list assoc ]
-
-  (* option -> var -> (flat: value list | nested: sub_var -> value list *)
-  type t = [ `static of var_value String_map.t | `regex of Re.t ] String_map.t
-
-  let is_regex_var ~var_name t =
-    match String_map.find var_name t with
-    | `regex _ -> true
-    | `static _ -> false
-    | exception Not_found -> false
-
-  let dump f t =
-    String_map.iter
-      (fun option vars ->
-        match vars with
-        | `regex regex -> Fmt.pf f "%S: %a@." option Re.pp regex
-        | `static vars ->
-          Fmt.pf f "%S:@." option;
-          String_map.iter (fun var _values -> Fmt.pf f "  - %S@." var) vars
-      )
-      t
-
-  let read_option_vars json =
-    match json with
-    | `Assoc assoc ->
-      let vars =
-        List.fold_left
-          (fun acc (var, var_value_json) ->
-            let var_values =
-              match var_value_json with
-              | `String value -> `flat [ value ]
-              | `Assoc sub_vars ->
-                `nested
-                  (List.map
-                     (function
-                       | sub_var, `String value -> (sub_var, [ value ])
-                       | sub_var, `List values_json ->
-                         ( sub_var,
-                           List.map Yojson.Basic.Util.to_string values_json
-                         )
-                       | _ ->
-                         Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp var_value_json;
-                         Fmt.invalid_arg
-                           "theme: var=%S: sub var value must be a string or a \
-                            list of string"
-                           var
-                       )
-                     sub_vars
-                  )
-              | `List values_json ->
-                `flat (List.map Yojson.Basic.Util.to_string values_json)
-              | _ ->
-                Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp var_value_json;
-                Fmt.invalid_arg
-                  "var=%S: theme value must be a string or a list of string" var
-            in
-            String_map.add var var_values acc
-          )
-          String_map.empty assoc
-      in
-      `static vars
-    | `List id_vars ->
-      let vars =
-        List.fold_left
-          (fun acc id_var_json ->
-            let id_var = Yojson.Basic.Util.to_string id_var_json in
-            String_map.add id_var (`flat [ id_var ]) acc
-          )
-          String_map.empty id_vars
-      in
-      `static vars
-    | `String regex -> `regex (Re.Posix.re ~opts:[] regex)
-    | _ ->
-      Fmt.epr "INPUT:@.%a@." Yojson.Basic.pp json;
-      invalid_arg "option value must be an object, a list or a regex string"
-
-  let read path =
-    let options_json = Yojson.Basic.from_file path in
-    let options_assoc = Yojson.Basic.Util.to_assoc options_json in
-    List.fold_left
-      (fun acc (option, vars_json) ->
-        let vars = read_option_vars vars_json in
-        String_map.add option vars acc
-      )
-      String_map.empty options_assoc
-
-  let regex_for_option option (t : t) =
-    match String_map.find option t with
-    | exception Not_found -> raise (Undefined_theme_opt option)
-    | `regex regex -> regex
-    | `static vars ->
-      let var_names = String_map.to_seq vars |> Seq.map fst in
-      Seq.map Re.str var_names |> List.of_seq |> Re.alt
-
-  let lookup_flat_var ~option ~var_name (t : t) =
-    let vars =
-      match String_map.find option t with
-      | exception Not_found -> raise (Undefined_theme_opt option)
-      | `static vars -> vars
-      | `regex _ ->
-        Fmt.failwith
-          "theme: var_name=%S: found regex when static var was expected"
-          var_name
-    in
-    try
-      let values = String_map.find var_name vars in
-      match values with
-      | `flat flat -> flat
-      | `nested _ ->
-        Fmt.invalid_arg
-          "theme: lookup_flat_var: option=%S: var=%S: var is not flat" option
-          var_name
-    with Not_found -> Fmt.invalid_arg "theme: var_name not found: %S" var_name
-
-  let lookup_nested_var ~option ~var_name ~sub_var_name (t : t) =
-    let vars =
-      match String_map.find option t with
-      | exception Not_found -> Fmt.failwith "theme: option not found"
-      | `static vars -> vars
-      | `regex _ ->
-        Fmt.failwith
-          "theme: var_name=%S: found regex when static var was expected"
-          var_name
-    in
-    try
-      let values = String_map.find var_name vars in
-      match values with
-      | `nested nested -> (
-        match List.assoc_opt sub_var_name nested with
-        | Some sub_val -> sub_val
-        | None ->
-          Fmt.invalid_arg
-            "theme: lookup_nested_var: option=%S: var=%S: sub_var=%S: sub var \
-             is not defined"
-            option var_name sub_var_name
-      )
-      | `flat _ ->
-        Fmt.invalid_arg
-          "theme: lookup_nested_var: option=%S: var=%S: var is not nested"
-          option var_name
-    with Not_found -> Fmt.invalid_arg "theme: var_name not found: %S" var_name
-end
-
 module Re_utils = struct
-  let delim_str = " \t\n\"'|`"
+  (* TODO: Move into config *)
+  let pseudo_class_variant =
+    let open Re in
+    alt
+      [
+        str "hover";
+        str "focus";
+        str "active";
+        str "focus-within";
+        str "focus-visible";
+        str "motion-safe";
+        str "disabled";
+        str "visited";
+        str "checked";
+        str "first";
+        str "last";
+        str "odd";
+        str "even";
+      ]
+
+  let delim_str = " \t\n\"'`|"
   let delim = Re.set delim_str
 
-  (* FIXME: matches with juxt trailing non-match: "columns-123" matches "columns-12" *)
-  let delimited expr =
+  let delimited ~breakpoint expr =
     let open Re in
-    seq [ alt [ delim; start ]; expr; alt [ delim; stop ] ]
+    seq
+      [
+        alt [ delim; start ];
+        group @@ opt (seq [ breakpoint; char ':' ]);
+        group @@ rep (seq [ pseudo_class_variant; char ':' ]);
+        group expr;
+        alt [ delim; stop ];
+      ]
 end
 
+type breakpoint = { name : string; size : string }
+
+type rule = {
+  breakpoint : breakpoint option;
+  selector : string;
+  decl_block : string list;
+}
+
 module Css_gen = struct
+  (* { media => (media size, { sel => decl list }) } *)
+  module Media_map = Map.Make (struct
+    type t = breakpoint option
+
+    let compare t1 t2 =
+      Option.compare String.compare
+        (Option.map (fun b -> b.name) t1)
+        (Option.map (fun b -> b.name) t2)
+  end)
+
+  type css = string list String_map.t Media_map.t
+
+  let is_empty = Media_map.is_empty
+
+  let pp_rule f (sel, rules) =
+    Fmt.pf f "@[<v2>.%s {@,%a;@]@,}" sel
+      (Fmt.list ~sep:Fmt.semi Fmt.string)
+      rules
+
+  let pp_media f (breakpoint_opt, rule) =
+    match breakpoint_opt with
+    | None ->
+      Fmt.pf f "@[<v>%a@]" (Fmt.iter_bindings String_map.iter pp_rule) rule
+    | Some breakpoint ->
+      Fmt.pf f "@[<v2>@media (%s) {@,%a@]@.}" breakpoint.size
+        (Fmt.iter_bindings String_map.iter pp_rule)
+        rule
+
+  let pp_css f (css : css) =
+    Format.fprintf f "%a" (Fmt.iter_bindings Media_map.iter pp_media) css
+
+  let css_of_rule_seq seq : css =
+    Seq.fold_left
+      (fun acc (rule : rule) ->
+        Media_map.update rule.breakpoint
+          (function
+            | None -> Some (String_map.singleton rule.selector rule.decl_block)
+            | Some old -> Some (String_map.add rule.selector rule.decl_block old)
+            )
+          acc
+      )
+      Media_map.empty seq
+
   let chars_that_need_escaping =
     Char_set.of_list [ ':'; '['; ']'; '('; ')'; '&'; '.'; '/' ]
 
-  let string_of_scope scope =
-    match scope with
-    | `sm -> "sm"
-    | `md -> "md"
-    | `lg -> "lg"
-    | `xl -> "xl"
-    | `xl2 -> "2xl"
-
-  let make_selector_name ~scope ~variants ~utility =
+  let make_selector_name ~breakpoint ~variants ~utility =
     let utility =
       let buf = Buffer.create (String.length utility + 4) in
       String.iter
@@ -214,63 +115,59 @@ module Css_gen = struct
         utility;
       Buffer.contents buf
     in
-    match (scope, variants) with
+    match (breakpoint, variants) with
     | None, [] -> utility
-    | Some scope, [] -> string_of_scope scope ^ "\\:" ^ utility
+    | Some { name; _ }, [] -> name ^ "\\:" ^ utility
     | _ ->
       let selector_prefix =
-        Option.fold scope ~none:variants ~some:(fun scope ->
-            string_of_scope scope :: variants
-        )
+        match breakpoint with
+        | None -> variants
+        | Some { name; _ } -> name :: variants
       in
-      let name = String.concat "\\:" selector_prefix ^ "\\:" ^ utility in
-      name ^ ":" ^ String.concat ":" variants
+      let buf = Buffer.create 16 in
+      List.iter
+        (fun p ->
+          if String.length p > 0 then (
+            Buffer.add_string buf p;
+            Buffer.add_string buf "\\:"
+          )
+        )
+        selector_prefix;
+      Buffer.add_string buf utility;
+      List.iter
+        (fun p ->
+          if String.length p > 0 then (
+            Buffer.add_string buf ":";
+            Buffer.add_string buf p
+          )
+        )
+        variants;
+      Buffer.contents buf
 end
-
-type rule = { selector : string; decl_block : string list }
-
-let pp_rule f rule =
-  Fmt.pf f "@[<v2>%s {@,%a@]@,}" rule.selector
-    (Fmt.list ~sep:Fmt.semi Fmt.string)
-    rule.decl_block
 
 module Schema_eval = struct
   let expected ctx expected actual =
     raise (Schema_error { ctx; expected; actual })
 
   type scope_var =
-    | Theme_var of { slot : int; option : string }
+    | Config_var of { slot : int; option : string }
     | Inline_var of { slot : int; re : Re.t }
-
-  let pp_scope_var f = function
-    | Theme_var x -> Fmt.pf f "(theme_var %d %s)" x.slot x.option
-    | Inline_var x -> Fmt.pf f "(theme_var %d %a)" x.slot Re.pp x.re
 
   type scope = {
     mutable vars : scope_var String_map.t;
     mutable var_count : int;
   }
 
-  let ( let* ) decls gen_decl = List.concat_map gen_decl decls
-
-  let rec cartesian_map f l =
-    match l with
-    | [] -> []
-    | [ x ] -> [ f x ]
-    | x :: l' ->
-      let* x' = f x in
-      let* rest = cartesian_map f l' in
-      [ x' :: rest ]
-
   let add_scope_var ~name var scope =
     scope.vars <- String_map.add name var scope.vars;
     scope.var_count <- scope.var_count + 1
 
-  let new_scope () = { vars = String_map.empty; var_count = 0 }
+  (* We start [var_count] with 3 because: 0=responsive 1=pseudo_variant 2=utility. *)
+  let new_scope () = { vars = String_map.empty; var_count = 3 }
 
   let get_scope_var ~name scope =
     try String_map.find name scope.vars
-    with Not_found -> raise (Undefined_scope_var name)
+    with Not_found -> raise (Config.Undefined_scope_var name)
 
   let get_matched_var_value ~slot g =
     try Re.Group.get g slot
@@ -279,17 +176,17 @@ module Schema_eval = struct
         "get_matched_var_value: slot %d not found in %S, nb_groups=%d" slot
         (Re.Group.get g 0) (Re.Group.nb_groups g)
 
-  let resolve_decl_seg ~theme ~scope (syn : syn) =
+  let resolve_decl_seg ~config ~scope (syn : flx) =
     match syn with
     | `str str_val -> fun ~g:_ -> [ str_val ]
     | `id scope_var_name -> (
       let scope_var = get_scope_var ~name:scope_var_name scope in
       fun ~g ->
         match scope_var with
-        | Theme_var v ->
+        | Config_var v ->
           let matched_var_value = get_matched_var_value ~slot:v.slot g in
-          Theme.lookup_flat_var ~option:v.option ~var_name:matched_var_value
-            theme
+          Config.lookup_flat_var ~option:v.option ~var_name:matched_var_value
+            config
         | Inline_var v ->
           let matched_var_value = Re.Group.get g v.slot in
           [ matched_var_value ]
@@ -298,126 +195,143 @@ module Schema_eval = struct
       let scope_var = get_scope_var ~name:scope_var_name scope in
       fun ~g ->
         match scope_var with
-        | Theme_var v ->
+        | Config_var v ->
           let matched_var_value = get_matched_var_value ~slot:v.slot g in
-          Theme.lookup_nested_var ~option:v.option ~var_name:matched_var_value
-            ~sub_var_name:scope_sub_var_name theme
+          Config.lookup_nested_var ~option:v.option ~var_name:matched_var_value
+            ~sub_var_name:scope_sub_var_name config
         | Inline_var v ->
           let matched_var_value = Re.Group.get g v.slot in
           [ matched_var_value ]
     )
     | _ -> expected "decl_seg" "string, id or variable" syn
 
-  let resolve_decl_tpl ~theme ~scope decl_name_seq decl_value_seq =
+  let resolve_decl_tpl ~config ~scope decl_name_seq decl_value_seq =
     let parts = decl_name_seq @ (`str ": " :: decl_value_seq) in
-    let decl_seg_delayed = List.map (resolve_decl_seg ~theme ~scope) parts in
+    let decl_seg_delayed = List.map (resolve_decl_seg ~config ~scope) parts in
     fun ~g ->
       decl_seg_delayed
       |> cartesian_map (fun delayed -> delayed ~g)
       |> List.map (String.concat "")
 
   (* Eval CSS declarations by expanding all variable combinations. *)
-  let eval_decl ~theme ~scope (syn : syn) =
+  let eval_decl ~config ~scope (syn : flx) =
     match syn with
     | `infix (":", `template decl_name_seq, `template decl_value_seq) ->
-      resolve_decl_tpl ~theme ~scope decl_name_seq decl_value_seq
+      resolve_decl_tpl ~config ~scope decl_name_seq decl_value_seq
     | `infix (":", `template decl_name_seq, decl_value_syn) ->
-      resolve_decl_tpl ~theme ~scope decl_name_seq [ decl_value_syn ]
+      resolve_decl_tpl ~config ~scope decl_name_seq [ decl_value_syn ]
     | `infix (":", decl_name_syn, `template decl_value_seq) ->
-      resolve_decl_tpl ~theme ~scope [ decl_name_syn ] decl_value_seq
+      resolve_decl_tpl ~config ~scope [ decl_name_syn ] decl_value_seq
     | `infix (":", decl_name_syn, decl_value_syn) ->
-      resolve_decl_tpl ~theme ~scope [ decl_name_syn ] [ decl_value_syn ]
+      resolve_decl_tpl ~config ~scope [ decl_name_syn ] [ decl_value_syn ]
     | _ -> expected "decl" "_ : _" syn
 
-  let rec eval_pat_var_value ~theme (syn : syn) =
+  let rec eval_pat_var_value ~config (syn : flx) =
     match syn with
     | `str str -> Re.str str
     | `char c -> Re.char c
     | `brackets (`infix ("-", `char c1, `char c2)) -> Re.rg c1 c2
-    | `id theme_option -> Theme.regex_for_option theme_option theme
-    | `postfix ("?", syn') -> Re.opt (eval_pat_var_value ~theme syn')
+    | `id config_option -> Config.regex_for_option config_option config
+    | `postfix ("?", syn') -> Re.opt (eval_pat_var_value ~config syn')
     | `pipe items ->
-      let items_re = List.map (eval_pat_var_value ~theme) items in
+      let items_re = List.map (eval_pat_var_value ~config) items in
       Re.longest (Re.alt items_re)
-    | `parens syn' -> eval_pat_var_value ~theme syn'
-    | `seq seq -> Re.seq (List.map (eval_pat_var_value ~theme) seq)
+    | `parens syn' -> eval_pat_var_value ~config syn'
+    | `seq seq -> Re.seq (List.map (eval_pat_var_value ~config) seq)
     | _ ->
-      Fmt.pr "INPUT:@.%a@." Flx.pp syn;
-      failwith "eval_pat_var_value: expected `\"...\"` or `_ | _`"
+      expected "pattern" "string, char, id, [char - char], `_?` or `_ | _`" syn
 
-  let eval_pat_seg ~theme scope (syn : syn) =
+  let eval_pat_seg ~config scope (syn : flx) =
     match syn with
     | `str str -> Re.str str
     | `char c -> Re.char c
-    | `parens (`infix ("=", `id var_name, var_value_syn)) ->
-      let var_value_re = eval_pat_var_value ~theme var_value_syn in
-      (* WIP: Handle regex var, currently is saved as theme var and fails on lookup. *)
+    | `parens (`infix ("=", `id var_name, var_value_syn))
+    | `infix ("=", `id var_name, var_value_syn) ->
+      let var_value_re = eval_pat_var_value ~config var_value_syn in
+      (* WIP: Handle regex var, currently is saved as config var and fails on lookup. *)
       let scope_var =
         match var_value_syn with
-        | `id option when Theme.is_regex_var ~var_name:option theme ->
+        | `id option when Config.is_regex_var ~var_name:option config ->
           Inline_var { slot = scope.var_count + 1; re = var_value_re }
-        | `id option -> Theme_var { option; slot = scope.var_count + 1 }
+        | `id option -> Config_var { option; slot = scope.var_count + 1 }
         | _ -> Inline_var { slot = scope.var_count + 1; re = var_value_re }
       in
       add_scope_var ~name:var_name scope_var scope;
       Re.group ~name:var_name var_value_re
-    | _ ->
-      Fmt.pr "INPUT:@.%a@." Flx.pp syn;
-      failwith "eval_pat_seg: expected `\"...\"` or `_ | _`"
+    | _ -> expected "utility pattern" "`\"...\"` or `_ | _`" syn
 
-  let eval_pat ~theme scope (syn : syn) =
+  let eval_pat ~config scope (syn : flx) =
     match syn with
-    | `seq segs -> Re.seq (List.map (eval_pat_seg ~theme scope) segs)
-    | seg -> Re.seq [ eval_pat_seg ~theme scope seg ]
+    | `template segs -> Re.seq (List.map (eval_pat_seg ~config scope) segs)
+    | seg -> Re.seq [ eval_pat_seg ~config scope seg ]
 
-  let eval_case ~theme (syn : syn) =
+  let eval_case ~config (syn : flx) =
     let scope = new_scope () in
     let pat, decl_syn_list =
       match syn with
       | `infix ("=>", pat, `braces (`comma decl_syn_list)) ->
         (pat, decl_syn_list)
       | `infix ("=>", pat, `braces decl_syn) -> (pat, [ decl_syn ])
-      | _ -> failwith "expected `_ => { _ }` or `_ => { _, _ }"
+      | _ -> expected "match case" "_ => { _ } or _ => { _, _ }" syn
     in
-    let case_re = Re_utils.delimited (eval_pat ~theme scope pat) in
-    let decl_list_delayed = List.map (eval_decl ~theme ~scope) decl_syn_list in
+    let case_re =
+      Re_utils.delimited
+        ~breakpoint:(Config.regex_for_media config)
+        (eval_pat ~config scope pat)
+    in
+    let decl_list_delayed = List.map (eval_decl ~config ~scope) decl_syn_list in
     let resolve_block g =
-      let selector =
-        Css_gen.make_selector_name ~scope:None ~variants:[]
-          ~utility:(Re.Group.get g 0)
-      in
       let decl_block = List.concat_map (fun run -> run ~g) decl_list_delayed in
-      { selector; decl_block }
+      let breakpoint =
+        let name_match = Re.Group.get g 1 in
+        if String.equal name_match "" then None
+        else
+          (* Drop trailing ':'. *)
+          let name = String.sub name_match 0 (String.length name_match - 1) in
+          let size = Config.lookup_media config name in
+          Some { name; size }
+      in
+      let variants_match = Re.Group.get g 2 in
+      let utility = Re.Group.get g 3 in
+      let variants = String.split_on_char ':' variants_match in
+      let selector =
+        Css_gen.make_selector_name ~breakpoint ~variants ~utility
+      in
+      { breakpoint; selector; decl_block }
     in
     (case_re, resolve_block)
 
-  let eval_group ~theme (syn : syn) =
+  let eval_group ~config (syn : flx) =
     match syn with
     | `infix ("=", `id _group_name, `braces (`comma cases)) ->
-      List.map (eval_case ~theme) cases
-    | `infix ("=", `id _group_name, `braces case) -> [ eval_case ~theme case ]
-    | _ ->
-      Fmt.pr "INPUT:@.%a@." Flx.pp syn;
-      failwith "expected `group_name = { _, _ }`"
+      List.map (eval_case ~config) cases
+    | `infix ("=", `id _group_name, `braces case) -> [ eval_case ~config case ]
+    | _ -> expected "utility" "{ _ , _ }" syn
 
-  let eval ~theme (syn : syn) =
+  let eval ~config (syn : flx) =
     match syn with
-    | `semi groups -> List.concat_map (eval_group ~theme) groups
-    | _ -> eval_group ~theme syn
+    | `semi groups -> List.concat_map (eval_group ~config) groups
+    | _ -> eval_group ~config syn
 end
 
-let read_theme path = Theme.read path
+let read_config path = Config.read path
 
-let read_schema ~theme path =
+let read_schema ~config path =
   let syn =
     In_channel.with_open_text path (fun chan ->
         Flx.parse (Flx.Lex.read_channel chan)
     )
   in
-  let cases = Schema_eval.eval ~theme syn in
+  let cases = Schema_eval.eval ~config syn in
   Re_match.compile cases
 
-type theme = Theme.t
+type config = Config.t
 type schema = rule Re_match.t
 
-let process input schema = Re_match.all schema input
+let process input schema =
+  let seq = Re_match.all schema input in
+  let css = Css_gen.css_of_rule_seq seq in
+  if not (Css_gen.is_empty css) then Fmt.pr "%a@." Css_gen.pp_css css
+
+exception Undefined_scope_var = Config.Undefined_scope_var
+exception Undefined_config_opt = Config.Undefined_config_opt

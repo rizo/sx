@@ -1,22 +1,16 @@
-(** CSS types *)
-
-type rule = { selector : string; decl_block : string list }
-
-val pp_rule : Format.formatter -> rule -> unit
-
 (** Theme and schema *)
 
-type theme
+type config
 type schema
 
-val read_theme : string -> theme
-val read_schema : theme:theme -> string -> schema
+val read_config : string -> config
+val read_schema : config:config -> string -> schema
 
 type schema_error
 
 exception Schema_error of schema_error
 exception Undefined_scope_var of string
-exception Undefined_theme_opt of string
+exception Undefined_config_opt of string
 
 val pp_schema_error : Format.formatter -> schema_error -> unit
-val process : string -> schema -> rule Seq.t
+val process : string -> schema -> unit

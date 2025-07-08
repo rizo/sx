@@ -11,5 +11,5 @@ depends: [
   "lambdasoup" {with-dev-setup}
 ]
 pin-depends: [
-  ["flx.dev" "git+https://github.com/rizo/shaper#2a50c021077fe16411961618a3e57e9905ca381f"]
+  ["flx.dev" "git+https://github.com/rizo/shaper#6561e048d3b9cbe7dfac1991990060f53f7dd442"]
 ]

@@ -13,6 +13,8 @@ in onix.env {
     "with-dev-setup" = false;
   };
 
+  opam-lock = ./onix.opam.locked;
+
   deps = {
     "ocaml-base-compiler" = "5.3.0";
     "ocaml-lsp-server" = "*";

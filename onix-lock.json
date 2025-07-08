@@ -3,7 +3,7 @@
    "repositories": [
      {
        "url": "https://github.com/ocaml/opam-repository.git",
-       "rev": "de2ef311424cac4cd51d415d017c8fab47f82ffe"
+       "rev": "11a53009bd75423d805636ff9384bf7cce8b0a9a"
      }
    ],
    "packages" : {
@@ -254,7 +254,7 @@
        "version": "dev",
        "src": {
          "url": "git+https://github.com/rizo/shaper",
-         "rev": "2a50c021077fe16411961618a3e57e9905ca381f"
+         "rev": "6561e048d3b9cbe7dfac1991990060f53f7dd442"
        },
        "depends": [
          "dune",
@@ -681,10 +681,10 @@
        ]
      },
      "re": {
-       "version": "1.12.0",
+       "version": "1.13.2",
        "src": {
-         "url": "https://github.com/ocaml/ocaml-re/releases/download/1.12.0/re-1.12.0.tbz",
-         "sha256": "a01f2bf22f72c2f4ababd8d3e7635e35c1bf6bc5a41ad6d5a007454ddabad1d4"
+         "url": "https://github.com/ocaml/ocaml-re/archive/refs/tags/1.13.2.tar.gz",
+         "sha512": "376b3ba1e351317a34b4c9a331fdc9ca5ae7c6a90eb2eb3393403a33b9f35ece63af7444a7c0c71ef29d512aa7fe56f7e485a118946e35d90039ddfd9127c020"
        },
        "depends": [
          "dune",
