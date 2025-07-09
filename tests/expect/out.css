@@ -1,0 +1,27 @@
+.disabled\:hover\:bg-red-300:disabled:hover {
+  background-color: oklch(0.808 0.114 19.571);
+}
+.scale-10 {
+  --sx-scale-x: 10%;
+  --sx-scale-y: 10%;
+  --sx-scale-z: 10%;
+  scale: var(--sx-scale-x, 1) var(--sx-scale-y, 1);
+}
+.scale-200 {
+  --sx-scale-x: 200%;
+  --sx-scale-y: 200%;
+  --sx-scale-z: 200%;
+  scale: var(--sx-scale-x, 1) var(--sx-scale-y, 1);
+}
+.scale-x-10 {
+  --sx-scale-x: 10%;
+  scale: var(--sx-scale-x, 1) var(--sx-scale-y, 1);
+}
+.scale-y-11 {
+  --sx-scale-y: 11%;
+  scale: var(--sx-scale-x, 1) var(--sx-scale-y, 1);
+}
+.scale-z-12 {
+  --sx-scale-z: 12%;
+  scale: var(--sx-scale-x, 1) var(--sx-scale-y, 1) var(--sx-scale-z, 1);
+}

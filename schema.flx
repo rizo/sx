@@ -145,3 +145,20 @@ box_shadow = {
   }
 };
 
+// https://tailwindcss.com/docs/scale
+scale = {
+  "scale-${n = int}" => {
+    "--sx-scale-x": "${n}%",
+    "--sx-scale-y": "${n}%",
+    "--sx-scale-z": "${n}%",
+    "scale": "var(--sx-scale-x, 1) var(--sx-scale-y, 1)"
+  },
+  "scale-${axis = "x" | "y"}-${n = int}" => {
+    "--sx-scale-${axis}": "${n}%",
+    "scale": "var(--sx-scale-x, 1) var(--sx-scale-y, 1)"
+  },
+  "scale-z-${n = int}" => {
+    "--sx-scale-z": "${n}%",
+    "scale": "var(--sx-scale-x, 1) var(--sx-scale-y, 1) var(--sx-scale-z, 1)"
+  }
+};

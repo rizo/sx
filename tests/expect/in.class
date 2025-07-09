@@ -1,2 +1,8 @@
 disabled:hover:bg-red-300
 hover:disabled:bg-red-300
+
+scale-10
+scale-x-10
+scale-y-11
+scale-z-12
+scale-200
