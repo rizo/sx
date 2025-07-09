@@ -115,17 +115,18 @@ module Css_gen = struct
         utility;
       Buffer.contents buf
     in
-    match (breakpoint, variants) with
-    | None, [] -> utility
-    | Some { name; _ }, [] -> name ^ "\\:" ^ utility
+    let variants_is_empty = String_set.is_empty variants in
+    match (breakpoint, variants_is_empty) with
+    | None, true -> utility
+    | Some { name; _ }, true -> name ^ "\\:" ^ utility
     | _ ->
       let selector_prefix =
         match breakpoint with
         | None -> variants
-        | Some { name; _ } -> name :: variants
+        | Some { name; _ } -> String_set.add name variants
       in
       let buf = Buffer.create 16 in
-      List.iter
+      String_set.iter
         (fun p ->
           if String.length p > 0 then (
             Buffer.add_string buf p;
@@ -134,7 +135,7 @@ module Css_gen = struct
         )
         selector_prefix;
       Buffer.add_string buf utility;
-      List.iter
+      String_set.iter
         (fun p ->
           if String.length p > 0 then (
             Buffer.add_string buf ":";
@@ -293,7 +294,9 @@ module Schema_eval = struct
       in
       let variants_match = Re.Group.get g 2 in
       let utility = Re.Group.get g 3 in
-      let variants = String.split_on_char ':' variants_match in
+      let variants =
+        string_set_of_string_list (String.split_on_char ':' variants_match)
+      in
       let selector =
         Css_gen.make_selector_name ~breakpoint ~variants ~utility
       in

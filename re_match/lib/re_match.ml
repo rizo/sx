@@ -9,7 +9,8 @@ let compile case_list =
     List.fold_left
       (fun acc case ->
         incr case_count;
-        case :: acc)
+        case :: acc
+      )
       [] case_list
   in
   let marks = Hashtbl.create !case_count in
@@ -19,7 +20,8 @@ let compile case_list =
       (fun acc (case_expr, case_action) ->
         let mark, case_expr' = Re.mark case_expr in
         Hashtbl.add marks mark (lazy (Re.compile case_expr), case_action);
-        Re.no_group case_expr' :: acc)
+        Re.no_group case_expr' :: acc
+      )
       [] case_list_rev
   in
   { marks; re = Re.compile (Re.longest (Re.alt expr_list)) }
